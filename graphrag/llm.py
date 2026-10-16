@@ -168,16 +168,32 @@ def generate_predictions(
             raise LLMResponseError("LLM provider did not return a response")
         response.raise_for_status()
     content = ""
+    finish_reason = None
     try:
-        message = response.json()["choices"][0]["message"]
+        body = response.json()
+    except ValueError as exc:
+        raise LLMResponseError("LLM provider returned a body that is not JSON") from exc
+    # OpenRouter reports upstream failures (overload, timeout) as HTTP 200
+    # with {"error": {...}} instead of choices.
+    if isinstance(body, dict) and body.get("error"):
+        detail = body["error"]
+        message = detail.get("message") if isinstance(detail, dict) else str(detail)
+        raise LLMResponseError(f"LLM provider error: {message}")
+    try:
+        choice = body["choices"][0]
+        finish_reason = choice.get("finish_reason")
+        message = choice["message"]
         content = message.get("content") or message.get("reasoning") or ""
         if not isinstance(content, str):
             content = json.dumps(content)
         return _coerce_predictions(content)
     except (KeyError, IndexError, TypeError, ValueError, ValidationError) as exc:
-        raise LLMResponseError(
-            "LLM returned a response that does not match the required JSON schema"
-        ) from exc
+        error = LLMResponseError(
+            "LLM returned a response that does not match the required JSON schema "
+            f"(finish_reason={finish_reason}, {len(content)} characters)"
+        )
+        error.raw_content = content
+        raise error from exc
 
 
 def validate_predictions(

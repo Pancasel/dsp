@@ -143,6 +143,12 @@ class PolypharmacySystem:
         except httpx.HTTPStatusError as exc:
             llm_status = "fallback"
             llm_error = f"LLM provider returned HTTP {exc.response.status_code}"
+            try:
+                detail = exc.response.json()["error"]["message"]
+            except (ValueError, KeyError, TypeError):
+                detail = None
+            if detail:
+                llm_error += f": {detail}"
         except httpx.RequestError as exc:
             llm_status = "fallback"
             llm_error = f"Could not reach the LLM provider: {exc.__class__.__name__}"
