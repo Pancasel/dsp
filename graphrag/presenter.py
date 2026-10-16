@@ -62,17 +62,29 @@ def readable_evidence(item: Evidence | dict, names: NameIndex, drugs: set[str]) 
     return data
 
 
+def select_effects(
+    ranked: list[dict[str, object]], max_serious: int, max_other: int
+) -> list[dict[str, object]]:
+    """The effects to show: top serious ones by score, then a few others.
+
+    `ranked` is already sorted by score, so each group keeps that order.
+    """
+    serious = [item for item in ranked if item["serious"]][:max_serious]
+    other = [item for item in ranked if not item["serious"]][:max_other]
+    return serious + other
+
+
 def build_llm_context(
     drugs: list[str],
     graph_context: dict[str, object],
     evidence: list[Evidence],
     names: NameIndex,
-    top_k: int,
+    max_serious: int,
+    max_other: int,
 ) -> dict[str, object]:
     """Compact, name-resolved context. Evidence IDs stay identical to the graph's."""
     drug_set = set(drugs)
-    ranked = graph_context["ranked_effects"]
-    top = ranked[:top_k]
+    top = select_effects(graph_context["ranked_effects"], max_serious, max_other)
     top_names = {item["name"].casefold() for item in top}
     serialized = []
     for item in evidence:
@@ -200,7 +212,8 @@ def build_interactions(
     evidence: list[Evidence],
     validated: list[dict[str, object]],
     names: NameIndex,
-    top_k: int,
+    max_serious: int,
+    max_other: int,
 ) -> list[dict[str, object]]:
     drug_set = set(drugs)
     ranked = graph_context["ranked_effects"]
@@ -215,7 +228,7 @@ def build_interactions(
         if item.side_effect:
             evidence_by_effect.setdefault(item.side_effect.casefold(), []).append(item)
 
-    chosen = list(ranked[:top_k])
+    chosen = select_effects(ranked, max_serious, max_other)
     chosen_names = {item["name"].casefold() for item in chosen}
     # Effects the LLM chose to explain outside the top-k are kept as well.
     for key in llm_by_name:
@@ -315,6 +328,39 @@ def mechanism_bridges(
         shown[item.drug_pair] = count + 1
         bridges.append(readable_evidence(item, names, drug_set))
     return bridges
+
+
+def pair_summary(
+    drugs: list[str], graph_context: dict[str, object], names: NameIndex
+) -> list[dict[str, object]]:
+    """Per drug pair: number of documented effects and how many are serious."""
+    counts: dict[tuple[str, str], list[int]] = {
+        pair: [0, 0] for pair in itertools.combinations(sorted(drugs), 2)
+    }
+    for item in graph_context["ranked_effects"]:
+        for pair in item["pairs"]:
+            entry = counts[tuple(pair)]
+            entry[0] += 1
+            entry[1] += bool(item["serious"])
+    return [
+        {
+            "pair": [names.drug_name(drug) for drug in pair],
+            "documented_effects": total,
+            "serious_effects": serious,
+        }
+        for pair, (total, serious) in counts.items()
+    ]
+
+
+def shared_targets(graph_context: dict[str, object], names: NameIndex) -> list[dict[str, object]]:
+    """Proteins targeted by three or more regimen drugs (the Tier 2 signal)."""
+    return [
+        {
+            "protein": names.gene_symbol(item["protein"]),
+            "drugs": [names.drug_name(drug) for drug in item["drugs"]],
+        }
+        for item in graph_context["shared_targets"]
+    ]
 
 
 def coverage(

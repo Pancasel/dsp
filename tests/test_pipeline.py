@@ -1,14 +1,11 @@
 import csv
-import io
 from pathlib import Path
 
 import pytest
-from PIL import Image
 
 from graphrag.config import Settings
-from graphrag.llm import LLMConfigurationError, ModelPrediction
+from graphrag.llm import ModelPrediction
 from graphrag.pipeline import PolypharmacySystem, RegimenError
-from graphrag.vision import ImageError
 
 
 def _write_csv(path: Path, headers: list[str], rows: list[list[str]]) -> None:
@@ -72,7 +69,6 @@ def system(tmp_path: Path, monkeypatch: pytest.MonkeyPatch) -> PolypharmacySyste
         monkeypatch.setenv(name, str(path))
     # Empty key: no request ever leaves the machine during tests.
     monkeypatch.setenv("LLM_API_KEY", "")
-    monkeypatch.setenv("VISION_API_KEY", "")
     return PolypharmacySystem.load(Settings.from_env())
 
 
@@ -111,6 +107,18 @@ def test_predict_without_llm_uses_template_fallback(system: PolypharmacySystem) 
     assert body["coverage"]["pairs_total"] == 6
     assert body["coverage"]["pairs_with_data"] == 2
     assert "GENE1" in body["mechanism_bridges"][0]["path_text"]
+    pairs = {tuple(item["pair"]): item for item in body["pair_summary"]}
+    assert pairs[("Alphazol", "Betamin")]["documented_effects"] == 2
+    assert pairs[("Alphazol", "Betamin")]["serious_effects"] == 1
+
+
+def test_relation_graph_html(system: PolypharmacySystem) -> None:
+    from graphrag.visualize import build_graph_html
+
+    body = system.predict(["D1", "D2", "D3", "D4"])
+    html = build_graph_html(body)
+    assert "Alphazol" in html and "GENE1" in html
+    assert "Alphazol" in build_graph_html(body, show_proteins=False, show_effects=False)
 
 
 def test_predict_with_llm_attaches_verified_explanations(
@@ -130,24 +138,3 @@ def test_predict_with_llm_attaches_verified_explanations(
     known = next(item for item in body["interactions"] if item["side_effect_en"] == "known event")
     assert known["explanation_source"] == "llm"
     assert known["explanation_vi"] == "Giải thích từ LLM."
-
-
-def test_identify_image(system: PolypharmacySystem, monkeypatch: pytest.MonkeyPatch) -> None:
-    with pytest.raises(ImageError):
-        system.identify_image(b"hello", "text/plain")
-    buffer = io.BytesIO()
-    Image.new("RGB", (10, 10)).save(buffer, format="PNG")
-    with pytest.raises(LLMConfigurationError):
-        system.identify_image(buffer.getvalue(), "image/png")
-
-    def fake_read_image(settings, data_url):
-        assert data_url.startswith("data:image/jpeg;base64,")
-        return {
-            "drugs": [{"brand": "Alphadol", "active_ingredients": ["Alphazol"], "strength": "500mg"}],
-            "raw_text": "ALPHADOL 500mg",
-        }
-
-    monkeypatch.setattr("graphrag.pipeline.read_image", fake_read_image)
-    body = system.identify_image(buffer.getvalue(), "image/png")
-    assert [item["stitch_id"] for item in body["detected"]] == ["D1", "D1"]
-    assert body["detected"][1]["method"] == "brand_alias"

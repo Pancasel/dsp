@@ -31,7 +31,10 @@ def run(args: argparse.Namespace) -> None:
     rows = []
     for index, regimen in enumerate(regimens, start=1):
         context, evidence = graph.retrieve(regimen, names.is_serious, settings.ranking)
-        llm_context = build_llm_context(regimen, context, evidence, names, settings.top_k_effects)
+        llm_context = build_llm_context(
+            regimen, context, evidence, names,
+            settings.max_serious_effects, settings.max_other_effects,
+        )
         start = time.perf_counter()
         try:
             raw = generate_predictions(settings, regimen, llm_context)

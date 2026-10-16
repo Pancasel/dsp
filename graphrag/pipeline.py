@@ -28,9 +28,10 @@ from graphrag.presenter import (
     coverage,
     drug_cards,
     mechanism_bridges,
+    pair_summary,
+    shared_targets,
 )
 from graphrag.resolver import DrugResolver, ResolveResult
-from graphrag.vision import detected_names, prepare_image, read_image
 
 
 class RegimenError(ValueError):
@@ -83,7 +84,6 @@ class PolypharmacySystem:
             "side_effect_translations": len(self.names.side_effects_vi),
             "llm_configured": bool(self.settings.llm_api_key),
             "llm_model": self.settings.llm_model,
-            "vision_model": self.settings.vision_model,
         }
 
     def list_drugs(self) -> list[dict[str, object]]:
@@ -102,24 +102,6 @@ class PolypharmacySystem:
 
     def search(self, query: str) -> ResolveResult:
         return self.resolver.resolve(query)
-
-    def identify_image(self, data: bytes, content_type: str | None) -> dict[str, object]:
-        """Image -> names read by the vision model -> resolved drugs.
-
-        Raises ImageError for bad files and LLMConfigurationError /
-        LLMResponseError / httpx errors when the vision call fails.
-        """
-        payload = read_image(self.settings, prepare_image(data, content_type))
-        detected = [
-            {"detected_text": name, **self.resolver.resolve(name).to_dict()}
-            for name in detected_names(payload)
-        ]
-        return {
-            "raw_text": payload["raw_text"],
-            "products": payload["drugs"],
-            "detected": detected,
-            "message": None if detected else "Không đọc được tên thuốc trong ảnh",
-        }
 
     def resolve_regimen(self, inputs: list[str]) -> tuple[list[str], dict[str, dict[str, object]]]:
         cleaned = [item.strip() for item in inputs if item and item.strip()]
@@ -142,13 +124,13 @@ class PolypharmacySystem:
             )
         return drugs, sources
 
-    def predict(self, inputs: list[str], top_k: int | None = None) -> dict[str, object]:
+    def predict(self, inputs: list[str]) -> dict[str, object]:
         drugs, sources = self.resolve_regimen(inputs)
-        top_k = top_k or self.settings.top_k_effects
+        limits = (self.settings.max_serious_effects, self.settings.max_other_effects)
         graph_context, evidence = self.graph.retrieve(
             drugs, self.names.is_serious, self.settings.ranking
         )
-        llm_context = build_llm_context(drugs, graph_context, evidence, self.names, top_k)
+        llm_context = build_llm_context(drugs, graph_context, evidence, self.names, *limits)
 
         llm_status, llm_error = "ok", None
         validated: list[dict[str, object]] = []
@@ -167,10 +149,12 @@ class PolypharmacySystem:
         return {
             "drugs": drug_cards(self.graph, self.names, drugs, sources),
             "interactions": build_interactions(
-                drugs, graph_context, evidence, validated, self.names, top_k
+                drugs, graph_context, evidence, validated, self.names, *limits
             ),
             "mechanism_bridges": mechanism_bridges(drugs, evidence, self.names),
             "coverage": coverage(drugs, self.graph, graph_context, evidence, self.names),
+            "pair_summary": pair_summary(drugs, graph_context, self.names),
+            "shared_targets": shared_targets(graph_context, self.names),
             "predictions": validated,
             "llm_status": llm_status,
             "llm_error": llm_error,
@@ -182,7 +166,8 @@ class PolypharmacySystem:
                     f"tier_{tier}": sum(item.tier == tier for item in evidence)
                     for tier in (1, 2, 3)
                 },
-                "top_k": top_k,
+                "max_serious_effects": limits[0],
+                "max_other_effects": limits[1],
                 "max_evidence": self.settings.max_evidence,
                 "hub_degree_threshold": self.settings.hub_degree_threshold,
             },

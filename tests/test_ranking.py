@@ -111,3 +111,27 @@ def test_tier3_labels_must_come_from_pair_candidates(tmp_path: Path) -> None:
     )
     assert len(accepted) == 1 and accepted[0]["hypothesis"] is True
     assert rejected == []
+
+    # A bridge without candidate labels supports no Tier 3 label at all.
+    from dataclasses import replace
+
+    bare = replace(tier3, candidates=())
+    assert validate_predictions(
+        [ModelPrediction(side_effect="shared event", tier=3, evidence_ids=[bare.evidence_id], explanation="x")],
+        [bare],
+        graph,
+    ) == []
+
+
+def test_select_effects_prefers_serious_and_caps_each_group() -> None:
+    from graphrag.presenter import select_effects
+
+    ranked = [
+        {"name": "rash", "serious": False},
+        {"name": "bleeding", "serious": True},
+        {"name": "nausea", "serious": False},
+        {"name": "coma", "serious": True},
+        {"name": "pain", "serious": False},
+    ]
+    chosen = select_effects(ranked, max_serious=1, max_other=2)
+    assert [item["name"] for item in chosen] == ["bleeding", "rash", "nausea"]

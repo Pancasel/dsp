@@ -20,7 +20,29 @@ ACCEPT_SCORE = 90.0
 ACCEPT_RATIO = 92.0
 SUGGEST_SCORE = 75.0
 MIN_KEY_LENGTH = 3
-_SPLIT = re.compile(r"\s*(?:[,;+/\n]|\bva\b|\band\b|\bvà\b)\s*", re.IGNORECASE)
+_SPLIT = re.compile(
+    r"\s*(?:[,;+/&\n.?!]|\bva\b|\band\b|\bvà\b|\bvới\b|\bvoi\b|\bwith\b|\bcùng\b)\s*",
+    re.IGNORECASE,
+)
+_STITCH = re.compile(r"\bCID\d{9}\b", re.IGNORECASE)
+# Filler words of chat messages, in normalize() form (no accents). They are
+# never treated as drug names and are dropped before fuzzy matching.
+CHAT_STOPWORDS = {
+    "toi", "minh", "em", "anh", "chi", "ban", "me", "bo", "ong", "ba", "con",
+    "dang", "se", "da", "vua", "moi", "hay", "thuong", "nen", "them", "bot",
+    "uong", "dung", "su", "an", "tiem", "boi", "xai",
+    "thuoc", "loai", "vien", "lieu", "ngay", "lan",
+    "voi", "cung", "va", "hoac", "kem", "chung", "nhau",
+    "co", "khong", "ko", "k", "sao", "the", "nao", "gi", "la", "bi", "duoc",
+    "ket", "hop", "phoi", "tac", "phu", "nguy", "hiem", "toan",
+    "cho", "hoi", "xem", "kiem", "tra", "giup", "nhe", "a", "oi",
+    "cua", "mot", "hai", "luc", "khi", "neu", "thi", "nay", "do", "kia",
+    "xin", "chao", "hello", "hi", "cam", "on",
+    "i", "im", "am", "taking", "take", "takes", "use", "using", "with", "plus",
+    "please", "check", "also", "is", "it", "safe", "my", "can", "combination",
+    "drug", "drugs", "medicine", "medicines", "pill", "pills", "and", "or",
+    "what", "about", "side", "effects", "effect",
+}
 
 
 @dataclass
@@ -101,6 +123,59 @@ class DrugResolver:
 
     def resolve_many(self, text: str) -> list[ResolveResult]:
         return [self.resolve(part) for part in split_query(text)]
+
+    def extract(self, text: str) -> list[ResolveResult]:
+        """Find the drugs mentioned in a free-text chat message.
+
+        "tôi đang uống panadol với ibuprofen, wafarin" -> Acetaminophen,
+        Ibuprofen, Warfarin. Each clause is matched exactly first, then by the
+        longest known name inside it, and only then by fuzzy matching on the
+        words left after removing chat filler words.
+        """
+        found: list[ResolveResult] = []
+        for stitch_id in _STITCH.findall(text):
+            found.append(self.resolve(stitch_id))
+        text = _STITCH.sub(" ", text)
+        for segment in split_query(text):
+            whole = self.resolve(segment)
+            if whole.method in {"exact", "brand_alias", "stitch_id"}:
+                found.append(whole)
+                continue
+            words = normalize(segment).split()
+            matches = self._scan_known_names(words)
+            if matches:
+                found.extend(matches)
+                continue
+            remaining = [word for word in words if word not in CHAT_STOPWORDS]
+            if remaining:
+                found.append(self.resolve(" ".join(remaining)))
+        unique: list[ResolveResult] = []
+        seen: set[str] = set()
+        for result in found:
+            key = result.stitch_id or f"?{normalize(result.query)}"
+            if key not in seen:
+                seen.add(key)
+                unique.append(result)
+        return unique
+
+    def _scan_known_names(self, words: list[str], longest: int = 5) -> list[ResolveResult]:
+        """Greedy longest match of known drug names inside a list of words."""
+        results = []
+        index = 0
+        while index < len(words):
+            for size in range(min(longest, len(words) - index), 0, -1):
+                phrase = " ".join(words[index : index + size])
+                hit = self._exact.get(phrase)
+                if hit and not (size == 1 and phrase in CHAT_STOPWORDS):
+                    stitch_id, original, method = hit
+                    results.append(
+                        ResolveResult(original, stitch_id, self.names.drug_name(stitch_id), method, 100.0)
+                    )
+                    index += size
+                    break
+            else:
+                index += 1
+        return results
 
     def _fuzzy(self, key: str, limit: int = 5) -> list[Candidate]:
         matches = process.extract(

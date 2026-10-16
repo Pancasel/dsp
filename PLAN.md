@@ -2,7 +2,7 @@
 
 ## 0. Bài toán
 
-Người dùng nhập **≥ 3 thuốc** bằng một trong ba cách: gõ tên hoạt chất, gõ biệt dược Việt Nam, hoặc chụp ảnh hộp thuốc. Hệ thống trả về:
+Người dùng **chat** để nêu các thuốc đang dùng (≥ 3), bằng tên hoạt chất hoặc biệt dược Việt Nam, viết thành câu tự nhiên. Hệ thống trả về:
 
 1. **Từng thuốc là gì**: tên generic, biệt dược, protein đích, tác dụng phụ khi dùng riêng.
 2. **Tác dụng phụ khi phối hợp**, chia 3 tầng theo report:
@@ -17,8 +17,8 @@ Tiêu chí ưu tiên: **kết quả phải đúng và truy vết được về d
 Ràng buộc kỹ thuật:
 - Chạy local.
 - LLM gọi qua OpenRouter, **1 request cho mỗi lần phân tích**.
-- Đọc ảnh bằng một vision model (có thể dùng nhà cung cấp riêng).
-- UI chỉ dùng Streamlit, không có server API riêng.
+- UI chỉ dùng Streamlit, gồm khung chat và đồ thị quan hệ có thể bật/tắt; không có server API riêng.
+- Không có phần chụp ảnh (đã bỏ theo yêu cầu).
 
 ---
 
@@ -60,21 +60,23 @@ streamlit run app.py
   ├─ PolypharmacySystem.load()            (cache bằng st.cache_resource)
   │    DecagonGraph (SQLite cache + dict targets/PPI) + NameIndex + DrugResolver
   │
-  ├─ search(text) / identify_image(ảnh)   → resolver: STITCH ID → khớp chính xác/biệt dược → fuzzy
-  │                                          (ảnh: 1 request tới vision model, chỉ để đọc chữ)
+  ├─ resolver.extract(tin nhắn chat)      → tách câu, bỏ từ đệm, khớp chính xác/biệt dược
+  │                                          → tên dài nhất có trong câu → fuzzy (chưa chắc thì hỏi lại)
   └─ predict([≥3 thuốc])
        retrieve: targets + protein chung + cầu PPI ≤ 2 bước + lịch sử cặp
        → bỏ hub (bậc PPI > HUB_DEGREE_THRESHOLD)
        → xếp hạng tác dụng phụ (ranking.py)
        → đóng toàn bộ evidence vào MỘT JSON → 1 request LLM
        → validator loại mọi dự đoán không khớp evidence
+       → chọn tối đa 10 tác dụng phụ nghiêm trọng + 5 tác dụng phụ khác
        → gắn tên thật, tiếng Việt, đường dẫn bằng chứng
+  └─ visualize.build_graph_html(result)   → đồ thị pyvis (thuốc, cặp, protein, tác dụng phụ)
        (không có LLM / LLM lỗi → giải thích mẫu, kết quả vẫn trả về đầy đủ)
 ```
 
 ```
 polypharmacy-graph-rag/
-├── app.py                  # UI Streamlit
+├── app.py                  # UI chat Streamlit + khung đồ thị
 ├── graphrag/
 │   ├── config.py           # Settings từ .env
 │   ├── dataset.py          # DecagonGraph: cache SQLite, retrieve, bridge, ứng viên Tier 3
@@ -82,12 +84,12 @@ polypharmacy-graph-rag/
 │   ├── names.py            # tên thuốc/gene, tiếng Việt, từ khóa nghiêm trọng
 │   ├── resolver.py         # chuỗi người dùng nhập → STITCH ID
 │   ├── llm.py              # prompt + gọi LLM + validator
-│   ├── vision.py           # ảnh → tên thuốc
+│   ├── visualize.py        # đồ thị quan hệ (pyvis)
 │   ├── presenter.py        # context gửi LLM, giải thích mẫu, kết quả hiển thị
 │   └── pipeline.py         # PolypharmacySystem
 ├── resources/              # CSV tên/biệt dược/gene/tiếng Việt/từ khóa (commit)
 ├── scripts/                # sinh resources (chạy 1 lần)
-├── eval/                   # thí nghiệm E1–E6
+├── eval/                   # thí nghiệm E1–E6, đánh giá độ chính xác A1–A4
 └── tests/
 ```
 
@@ -99,6 +101,8 @@ polypharmacy-graph-rag/
 - Chuẩn hóa chuỗi nhập: bỏ dấu, bỏ hàm lượng ("500mg", "250"), bỏ dạng bào chế và tên muối ("kali", "natri", "HCl").
 - Fuzzy chỉ tự nhận khi điểm ≥ 90, độ giống ký tự ≥ 92 và ứng viên thứ nhất bỏ xa ứng viên thứ hai. Nếu không, hệ thống hỏi lại người dùng.
 - Ví dụ: "esomeprazole" không bao giờ bị nhận thành Omeprazole, "Vitamin C" không bị nhận thành Ergocalciferol.
+
+**Hiển thị:** không cho người dùng chọn số lượng. Hệ thống hiện tối đa `MAX_SERIOUS_EFFECTS` = 10 tác dụng phụ nghiêm trọng có điểm cao nhất. Tối đa `MAX_OTHER_EFFECTS` = 5 tác dụng phụ khác nằm trong một mục thu gọn.
 
 **Xếp hạng**
 
@@ -119,11 +123,6 @@ Các trọng số đặt trong `.env`. Tier 2 chỉ áp cho đúng các cặp kh
 - Mỗi lần phân tích gửi đúng 1 request, kèm toàn bộ evidence dưới dạng JSON (tên thật kèm ID, top tác dụng phụ, đường dẫn).
 - LLM trả JSON. Dự đoán nào trích evidence ID không tồn tại, sai tier hoặc sai nhãn đều bị loại.
 
-**Vision**
-- Dùng các biến `VISION_MODEL`, `VISION_BASE_URL`, `VISION_API_KEY`. Nếu để trống thì dùng lại cấu hình `LLM_*`.
-- Ảnh được thu nhỏ còn cạnh dài ≤ 1600px trước khi gửi.
-- Mọi tên đọc được đều đi qua resolver, và người dùng xác nhận trước khi thêm vào phác đồ.
-
 ---
 
 ## 4. Thí nghiệm (chương 4 của report)
@@ -131,11 +130,16 @@ Các trọng số đặt trong `.env`. Tier 2 chỉ áp cho đúng các cặp kh
 | Mã | Nội dung | Trạng thái / kết quả |
 |---|---|---|
 | E1 | Resolver trên 70 input (generic, biệt dược, kèm hàm lượng, sai chính tả, không có trong data) | Đúng 98.6%, nhận sai 0. Ca duy nhất không tự nhận ("diazepan") thì hệ thống hỏi lại |
-| E2 | Đọc ảnh khoảng 30 hộp/vỉ thuốc | Chưa chạy, cần API vision |
 | E3 | Tỷ lệ dự đoán của LLM qua được validator | Chưa chạy, cần API: `eval/e3_llm_groundedness.py --yes-call-api` |
 | E4 | Ứng viên Tier 3 trên 2000 cặp bị ẩn | precision@10: đồ thị 0.507, phổ biến toàn cục 0.418, ngẫu nhiên 0.065. Hit@10: 0.966 / 0.946 / 0.420 |
 | E5 | Ngưỡng hub 100 → không giới hạn | Số cầu Tier 3 trung bình tăng 3.6 → 4.4, số hub bị loại giảm 41.5 → 0. Ngưỡng 500 giữ 98% số cầu |
-| E6 | Thời gian truy xuất | Trung bình: k=3 là 0.02 s, k=5 là 0.05 s, k=8 là 0.12 s (p95 với k=8: 0.29 s) |
+| E6 | Thời gian truy xuất | Trung bình: k=3 là 0.02–0.04 s, k=5 là 0.05–0.12 s, k=8 là 0.12–0.26 s (dao động theo tải máy) |
+| A1 | Đối chiếu đầu ra của 200 phác đồ với CSV gốc (`eval/run_accuracy.py`) | Tier 1 precision = recall = 100% (52,880); Tier 2 72/72; mọi đường dẫn Tier 1/2/3 đúng từng cạnh (40,529) |
+| A2 | Cầu protein có dự đoán được cặp có tương tác? | AUROC 0.543 (gần ngẫu nhiên 0.495); baseline độ phổ biến 0.943. Cầu có ở 95.7% số cặp → Tier 3 chỉ là giả thuyết cơ chế |
+| A3 | Dự đoán từng tác dụng phụ, giao thức Decagon (963 TDP ≥ 500 cặp) | AUROC 0.951, AUPRC 0.940, AP@50 0.966; baseline độ phổ biến 0.908/0.889/0.883; Decagon công bố 0.872/0.832/0.803 (giao thức khác, chỉ tham chiếu) |
+| A4 | Validator với dự đoán bị làm sai có chủ đích | Loại 950/950 dự đoán sai, giữ 300/300 dự đoán hợp lệ |
+
+Chi tiết, bảng và hình cho report: `eval/results/ACCURACY.md`.
 
 **Kiểm tra tính đúng trên dữ liệu thật** (đối chiếu trực tiếp với CSV gốc):
 - Mọi cặp và tác dụng phụ trả về đều có trong `bio-decagon-combo.csv`: 0 lỗi trên 4 phác đồ.
@@ -148,6 +152,5 @@ Các trọng số đặt trong `.env`. Tier 2 chỉ áp cho đúng các cặp kh
 
 - [ ] Chạy thử với LLM thật và soát chất lượng giải thích.
 - [ ] E3 (khoảng 10 request).
-- [ ] E2: cấu hình vision model rồi thử bằng ảnh thật. Nếu kết quả không ổn thì bỏ phần ảnh (chỉ cần ẩn khung chụp trong UI).
 - [ ] Người có chuyên môn soát bản dịch, ưu tiên các tác dụng phụ có dấu ⚠.
 - [ ] Sửa số liệu trong report theo mục 1.

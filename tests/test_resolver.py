@@ -71,3 +71,24 @@ def test_resolve_many(resolver: DrugResolver) -> None:
         "CID000003672",
         "CID000006691",
     ]
+
+
+@pytest.mark.parametrize(
+    ("message", "expected"),
+    [
+        ("tôi đang uống panadol với ibuprofen và warfarin", ["CID000001983", "CID000003672", "CID000006691"]),
+        ("Mình dùng Hapacol 500mg cùng Losec thì có sao không?", ["CID000001983", "CID000004594"]),
+        ("I'm taking Coumadin and Brufen", ["CID000006691", "CID000003672"]),
+        ("thêm wafarin", ["CID000006691"]),
+        ("CID000003961 và paracetamol", ["CID000003961", "CID000001983"]),
+        ("xin chào", []),
+    ],
+)
+def test_extract_drugs_from_chat_messages(resolver: DrugResolver, message: str, expected: list[str]) -> None:
+    assert [item.stitch_id for item in resolver.extract(message)] == expected
+
+
+def test_extract_keeps_ambiguous_names_for_confirmation(resolver: DrugResolver) -> None:
+    results = resolver.extract("uống esomeprazole với ibuprofen")
+    assert results[0].stitch_id is None and results[0].method in {"ambiguous", "not_found"}
+    assert results[1].stitch_id == "CID000003672"

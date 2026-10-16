@@ -1,0 +1,7 @@
+feature,pairs,positives,auroc,auprc,coverage,precision_if_present,precision_if_absent,lift
+Protein đích chung (Tier 2),40186,14247,0.532,0.397,0.2764,0.4024,0.3362,1.135
+Cầu 1 bước (đích A ↔ đích B),40186,14247,0.543,0.3985,0.5912,0.3809,0.3163,1.075
+Cầu 2 bước (qua protein trung gian),40186,14247,0.5367,0.3983,0.9566,0.3567,0.3077,1.006
+Tổng hợp cầu protein (Tier 3),40186,14247,0.5434,0.4022,0.9567,0.3567,0.3069,1.006
+Baseline: độ phổ biến thuốc,40186,14247,0.9428,0.9193,,,,
+Ngẫu nhiên,40186,14247,0.4952,0.3505,,,,

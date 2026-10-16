@@ -216,10 +216,10 @@ def validate_predictions(
             canonical = graph.side_effect_names.get(label)
             if canonical is None:
                 continue
-            # Every cited bridge must list the label among its candidates.
+            # Every cited bridge must list the label among its candidates; a
+            # bridge without candidates supports no label at all.
             if any(
-                item.candidates
-                and label not in {name.casefold() for name in item.candidates}
+                label not in {name.casefold() for name in item.candidates}
                 for item in selected
             ):
                 continue

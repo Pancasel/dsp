@@ -69,12 +69,10 @@ class Settings:
     gene_names_file: Path | None = None
     side_effects_vi_file: Path | None = None
     serious_keywords_file: Path | None = None
-    vision_model: str = ""
-    # Empty means "reuse the LLM provider" (llm_base_url / llm_api_key).
-    vision_base_url: str = ""
-    vision_api_key: str = ""
     llm_timeout: float = 120.0
-    top_k_effects: int = 15
+    # Shown per analysis: the most dangerous effects, plus a few others.
+    max_serious_effects: int = 10
+    max_other_effects: int = 5
     tier3_candidates_per_pair: int = 20
     ranking: RankingWeights = RankingWeights()
 
@@ -124,11 +122,9 @@ class Settings:
             serious_keywords_file=_optional_path_from_env(
                 "SERIOUS_KEYWORDS_FILE", "resources/serious_keywords.csv"
             ),
-            vision_model=os.environ.get("VISION_MODEL", llm_model),
-            vision_base_url=os.environ.get("VISION_BASE_URL", "").rstrip("/"),
-            vision_api_key=os.environ.get("VISION_API_KEY", ""),
             llm_timeout=_float("LLM_TIMEOUT", "120"),
-            top_k_effects=_bounded_int("TOP_K_EFFECTS", "15", minimum=1),
+            max_serious_effects=_bounded_int("MAX_SERIOUS_EFFECTS", "10", minimum=1),
+            max_other_effects=_bounded_int("MAX_OTHER_EFFECTS", "5", minimum=0),
             tier3_candidates_per_pair=_bounded_int(
                 "TIER3_CANDIDATES_PER_PAIR", "20", minimum=1
             ),
