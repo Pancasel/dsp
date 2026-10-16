@@ -48,6 +48,7 @@ class RankingWeights:
     not_in_mono: float = 1.0
     serious: float = 2.0
     amplified: float = 1.0
+    critical: float = 2.0
 
 
 @dataclass(frozen=True)
@@ -69,6 +70,7 @@ class Settings:
     gene_names_file: Path | None = None
     side_effects_vi_file: Path | None = None
     serious_keywords_file: Path | None = None
+    serious_effects_file: Path | None = None
     llm_timeout: float = 120.0
     # Shown per analysis: the most dangerous effects, plus a few others.
     max_serious_effects: int = 10
@@ -122,6 +124,9 @@ class Settings:
             serious_keywords_file=_optional_path_from_env(
                 "SERIOUS_KEYWORDS_FILE", "resources/serious_keywords.csv"
             ),
+            serious_effects_file=_optional_path_from_env(
+                "SERIOUS_EFFECTS_FILE", "resources/serious_effects.csv"
+            ),
             llm_timeout=_float("LLM_TIMEOUT", "120"),
             max_serious_effects=_bounded_int("MAX_SERIOUS_EFFECTS", "10", minimum=1),
             max_other_effects=_bounded_int("MAX_OTHER_EFFECTS", "5", minimum=0),
@@ -134,5 +139,6 @@ class Settings:
                 not_in_mono=_float("RANK_W_NOT_IN_MONO", "1.0"),
                 serious=_float("RANK_W_SERIOUS", "2.0"),
                 amplified=_float("RANK_W_AMPLIFIED", "1.0"),
+                critical=_float("RANK_W_CRITICAL", "2.0"),
             ),
         )

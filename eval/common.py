@@ -33,5 +33,6 @@ def load(hub_degree_threshold: int | None = None):
         settings.gene_names_file,
         settings.side_effects_vi_file,
         settings.serious_keywords_file,
+        settings.serious_effects_file,
     )
     return settings, graph, names, DrugResolver(names, graph.drug_ids)

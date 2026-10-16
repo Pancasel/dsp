@@ -72,7 +72,7 @@ CID000002283,2283,Bacitracin,
 CID000002284,2284,Baclofen,"Lioresal|4-Amino-3-(4-chlorophenyl)butanoic acid|Baclon|Kemstro|DL-Baclofen|Baclofene|Baclofeno|4-Amino-3-(4-chlorophenyl)butyric acid|(+-)-Baclofen|Baclofenum|Baclophen|beta-(4-Chlorophenyl)gaba|Lioresal Intrathecal|(RS)-BACLOFEN|Gablofen|Ciba 34,647-Ba|Ba-34,647|DL-4-Amino-3-p-chlorophenylbutanoic acid|FLEQSUVY|LYVISPAH|OZOBAX|H789N3FKE8|Chlorophenyl GABA|Genpharm"
 CID000002308,2308,Beclomethasone,NBMKJKDGKREAPL-UHFFFAOYSA-N
 CID000002311,2311,Benazepril,O-Ethoxy Benazeprilat|Benazepril Impurity B|XPCFTKFZXHTYIP-UHFFFAOYSA-N
-CID000002349,2349,Penicillins,"penicillin|Penicillin Antibiotics|Antibiotics, Penicillin|Cillin|Benzopenicillin|Benzylpenicillin G|Free benzylpenicillin|(Phenylmethyl)penicillin|Penicillinic acid, benzyl-|(Phenylmethyl)penicillinic acid|Benzyl-6-aminopenicillinic acid|Penicilline G sodium salt|WLN: T45 ANV ESTJ CMV1R& F F GVQ"
+CID000002349,2349,Benzylpenicillin,"Penicillin G|Benzathine penicillin|Procaine penicillin|Penicillin Antibiotics|Antibiotics, Penicillin|Cillin|Benzopenicillin|Benzylpenicillin G|Free benzylpenicillin|(Phenylmethyl)penicillin|Penicillinic acid, benzyl-|(Phenylmethyl)penicillinic acid|Benzyl-6-aminopenicillinic acid|Penicilline G sodium salt"
 CID000002369,2369,Betaxolol,"Betaxololum|O0ZR1R6RZ2|betaxololo|Oxodal|Betoptic susp|Betaxolol Alcon|Alcon, Betaxolol|C07AB05|S01ED02|Betoptic|Kerlone|Betaxolol (INN)|KERLEDEX|Dextrobetaxolol|Betaxolol S|(R)-Betaxolol; (+)-Betaxolol|Betaxolol (Standard)"
 CID000002370,2370,Bethanechol,"Amidopropyldimethylbetaine|Carbamyl-beta-methylcholine|Carbamoyl-beta-methylcholine|Besacholine|2-carbamoyloxypropyl-trimethylazanium|beta-Methyl carbachol chloride|Bethaine choline chloride|Uro-Carb|004F72P8F4|Bethanecol|Hermes, Myo|PMS Bethanechol Chloride|2-carbamoyloxypropyl(trimethyl)azanium|2-carbamoyloxypropyl-trimethyl-azanium|Carbamyl--methylcholine|Bethanechol - API Standards"
 CID000002375,2375,Bicalutamide,"Cosudex|Calutide|Kalumid|bicalutamida|ICI 176,334|A0Z3NAU9DP|ICI176,334-1|bicalutamidum|L02BB03|Bicalutamide (CDX)|BICALUTAMIDE (USP-RS)|Bicalutamide Crystalline Form II|Raffolutil|Bicalox|Bical|Propanamide,|Calutide;|Cosudex;|Bicalutamide CRS|Bicalutamide (Standard)|Bicalutamide (JP18/USP/INN)|EX-A962|Bicalutamide for system suitability CRS"
@@ -167,7 +167,7 @@ CID000003152,3152,Donepezil,"donepezilo|Donaz|donepezilum|Domepezil|donezpil hyd
 CID000003154,3154,Dorzolamide,rac-Dorzolamide|DORZOLAMIDE BASE|C10H16N2O4S3|(4R)-Dorzolamide|Dorzolamide impurity B|IAVUPMFITXYVAF-UHFFFAOYSA-N
 CID000003157,3157,Doxazosin,"Doxazosine|Doxazosinum|Doxazosina|C02CA04|ratio Doxazosin|ratio-Doxazosin|DoxaUro|Doxazosin Wolff|Novo Doxazosin|Apo Doxazosin|Gen Doxazosin|Doxa Puren|MTW Doxazosin|Neo, Carduran|Doxazosin ratiopharm|Ct, Doxazosin Von|Von Ct, Doxazosin|Doxazosina Ratiopharm|Ratiopharm, Doxazosina|Monohydrochloride, Doxazosin|Doxazosin (INN)|C23H25N5O5|(+/-)-DOXAZOSIN|Cardura XL (TN)"
 CID000003158,3158,Doxepin,Doxepina|Doxepine|Sinepin|Doxepinum|5ASJ6HUZ7D|Sinquan|ApoDoxepin|Novo Doxepin|Apo Doxepin|Doxepin RPh|D04AX01|N06AA12|Sinequan|Zonalon|(E)-Doxepin-d3
-CID000003161,3161,CID000003161,
+CID000003161,3161,Doxycycline,Vibramycin|Doxy
 CID000003168,3168,Droperidol,Droleptan|Dehydrobenzperidol|Inapsine|Dridol|Properidol|Sintodril|Sintosian|Halkan|Inapsin|Deidrobenzperidolo|Inopsin|Droperidolo|Droperidolum|O9U0F09D5X|N01AX01|N05AD08|DHBP|Vetkalm|Innovar|Thalamonal|Inappin|Innovan|Leptofen|Inoval
 CID000003198,3198,Econazole,(+-)-Econazole|6Z1Y2V4A7M|Ekonazole|GynoPevaril|Gyno Pevaril|Gyno Pevaryl|Gyno Pervaryl 150|D01AC03|G01AF05|Gyno-Pevaril|Gyno-pevaryl|(+/-)-Econazol|()-Econazol|(.+/-.)-Econazole|(+/-)-ECONAZOLE
 CID000003203,3203,Rac-Efavirenz,efavirenz|YXP9JDK7R7|rac Efavirenz|Efavirenz Racemic|(+/-)-Efavirenz|(Rac)-Efavirenz|rac Efavirenz-d4|Racemic-Efavirenz|Efavirenz Racemate
@@ -280,7 +280,7 @@ CID000004011,4011,Maprotiline,"Maprotilina|Maprotylina|Maprotilinum|2U1W68TROF|B
 CID000004034,4034,Monamine,"Meclizine|Meclozine|Parachloramine|Navicalm|Suprimal|Vomisseis|Ravelon|Bonadettes|Sea-Legs|Chiclida|Itinerol|Siguran|Travelon|Neo-suprimal|Neo-suprimel|Nevidoxine|DVert|D Vert|Ru Vert M|Hydrochloride, Meclizine|Dihydrochloride, Meclizine|Monohydrochloride, Meclizine|Histametizyne|Postafene"
 CID000004044,4044,Mefenamic Acid,"mefenamic|Ponstel|Mephenamic acid|Mephenaminic acid|Ponstan|Methenamic acid|Vialidon|Lysalgo|Tanston|Acide mefenamique|Mefenaminsaeure|N-2,3-Xylylanthranilic acid|Acido mefenamico|Mefenaminic Acid|Acidum mefenamicum|N-(2,3-Xylyl)-2-aminobenzoic acid|N-(2,3-Dimethylphenyl)anthranilic acid|Gardan|Anthranilic acid, N-2,3-xylyl-|2-(2,3-dimethylphenylamino)benzoic acid|J2.344B|M01AG01|Mefenamicacid|Mendys|Ponstan fte"
 CID000004046,4046,Mefloquine,"Mefloquina|Racemic mefloquine|Mefloquinum|WR 142,490|Mephloquine|P01BC02|WR142,490|WR177,602|WR 177,602|Lariam|Mefloquinone|melfoquine|Mefaquin|rac-mefloquine|Mefloquine EP Impurity C|Mefloquine Hydrochloride - Impurity C"
-CID000004052,4052,CID000004052,
+CID000004052,4052,Meloxicam,Mobic|Metacam|Mobicox
 CID000004053,4053,Melphalan,"Sarcolysin|Merphalan|Sarcolysinum|Sarcolisina|Phenylalanin-lost|A960M0G5TP|MERPHALAN (IARC)|Sarcolysine (INN-French)|Sarcolysinum (INN-Latin)|Sarcolisina (INN-Spanish)|4-(Bis(2-chloroethyl)amino)phenylalanine|DL-Phenylalanine mustard|Sarcolysin, dl-|Melphalan dl-form|Medfalan|D-Sarcolysin|Merfalan|DL-Sarcolysine|DL-Sarcolysin|Rcra waste number U150|Melphalan DL-isomer|D-Phenylalanine mustard base|WLN: QVYZ1R DN2G2G-L|WLN: QVYZ1R DN2G2G -D|p-N-Di(chloroethyl)aminophenylalanine"
 CID000004054,4054,Memantine,"3,5-dimethyladamantan-1-amine|1-Amino-3,5-dimethyladamantane|Memantina|3,5-Dimethyl-1-adamantanamine|Memantinum|1,3-Dimethyl-5-adamantanamine|nemdatine|3,5-Dimethyl-1-aminoadamantane|W8O17SJF3T|1,3-Dimethyl-5-aminoadamantane|Memantin|N06DX01|Axura|3,5-Dimethyl-1-adamantylamine|3,5-dimethyladamantanylamine|Memantine (INN)|alzantin|Exiba (TN)|1-amino-3,5-dimethyladamantan|1-amino-3,5-dimethyl adamantane|1-amino-3,5-dimethyl-adamantane|3,5-Dimethyl-adamantan-1-ylamine|3,5-Dimethyl-1-aminoadamantane HCl"
 CID000004058,4058,Meperidine,Pethidine|Isonipecaine|Pethidineter|Meperidol|Pethanol|Pethidin|Phetidine|Nemerol|Pipersal|Petydyna|Petidina|Pethidinum|Ethyl 1-methyl-4-phenylisonipecotate|Renaudin|Pethidine DBL|Dolsin|Lydol|N-Methyl-4-phenyl-4-carbethoxypiperidine|IDS-NP-001|9E338QE28F|Isonipecain|Operidine EPJ I|N02AB02|Dolcontral
@@ -302,7 +302,7 @@ CID000004178,4178,Mexiletine,"1-(2,6-dimethylphenoxy)propan-2-amine|Mexiletina|1
 CID000004189,4189,Miconazole,"Daktarin IV|Miconazol|Miconazolo|Miconazolum|Daktarin|Oravig|7NNO0D7S5M|Dermazole|Dumicoat|Loramyc|Monistat-3|Roycederm Tinea Treatment Cream|A01AB09|A07AC01|D01AC02|G01AF04|J02AB01|S02AA13|R14,889|Conofite|Monistat|Monistat IV|Minostate|Vusion"
 CID000004192,4192,Midazolam,"Buccolam|Midazolamum|mezolam|Nayzilam|Midazolam civ|R60L0SM5BC|Epistatus|Maleate, Midazolam|Hydrochloride, Midazolam|Midazolam in Sodium Chloride|Midazolam Injection, 10 mg|N05CD08|MIDAZOLAM IN 0.8% SODIUM CHLORIDE|MIDAZOLAM IN 0.9% SODIUM CHLORIDE|Dormicum|Versed|Midazolam Base|Dazolam|Midazolam (1.0 mg/mL in methanol)|Dormicum (TN)|Medazolam|Buccolam (TN)|Nayzilam (TN)|08J"
 CID000004195,4195,Midodrine,Midodrin|Midodrina|Midodrinum|6YE7PBM15H|Midodrinum (INN-Latin)|C01CA17|Midodrine free base|Midodrine (INN)
-CID000004200,4200,CID000004200,
+CID000004200,4200,Minocycline,Minocin|Minocyn
 CID000004201,4201,Minoxidil,"Loniten|Rogaine|Minoximen|Theroxidil|Alopexil|Alostil|Tricoxidil|Lonolox|Regaine|Normoxidil|Prexidil|Minodyl|Pierminox|RiUP|Mintop|U-10,858|Minoxidilum|Apo-Gain|Neoxidil|2,6-diamino-4-piperidylpyrimidin-1-ol|Loniten (TN)|Rogaine (TN)|Riup (TN)|Minoxidil CRS"
 CID000004205,4205,Mirtazapine,Remeron|Mepirzepine|6-Azamianserin|Remergon|Zispin|Promyrtil|Remergil|Rexer|Avanza|Norset|Remeron SolTab|Mirtazapina|Mirtazapinum|Mirataz|Mirtazapin|Mirtazapine anhydrous|Mepirzapine|Remeronsoltab|6 Azamianserin|N06AX11|Mirtazepine|Mepirzapin|Mirtazipine|Azamianserin
 CID000004211,4211,Mitotane,"Mitotan|Lysodren|Chlodithane|Chloditan|o,p'-DDD|2,4'-Ddd|Mitotano|Opeprim|o,p'-TDE|o,p-Tde|Mitotanum|2,4'-Dichlorodiphenyldichloroethane|o,p'-Dichlorodiphenyldichloroethane|78E4J5IB5J|O,p'-ddd,o p'-tde|(o,p)-DDD|Khloditan|Mytotan|ortho,para-DDD|ortho,para DDD|Lisodren|Opddd|L01XX23|2, 4'-Dichlorodiphenyldichloroethane"
@@ -346,7 +346,7 @@ CID000004614,4614,Oxaprozin,"Daypro|Alvo|Oxaprozine|Oxaprozinum|Deflam|Oxaprozin
 CID000004616,4616,Oxazepam,Serax|Tazepam|Adumbran|Droxacepam|Rondar|Serenid|Serepax|Seresta|Sobril|Zaxopam|Ansioxacepam|Durazepam|Noctazepam|Psiquiwas|Quilibrex|Anxiolit|Aplakil|Astress|Drimuel|Limbial|Murelax|Nesontil|Pacienx|Praxiten
 CID000004634,4634,Oxybutynin,Oxytrol|Oxybutynine|kentera|Oxibutinina|Oxybutyninum|Anturol|Cystrin|Oxytrol for Women|Dridase|Lyrinel XL|Promictuline|Urimin|Contimin 5|Contimin 2.5|GELNIQUE 3%|G04BD04|Ditropan|Oxibutyninum|Oxybutinin|Oxybutynin Base|transdermal patch|Oxybutynin transdermal|oxybutynin topical gel|Oxybutynin transdermal patch
 CID000004635,4635,Oxycodone,Oxicone|Tekodin (free base)|Eucodal (Salt/Mix)|Tecodin (Salt/Mix)|Dinarkon (Salt/Mix)|BRUQQQPBMZOVGD-UHFFFAOYSA-N
-CID000004645,4645,CID000004645,
+CID000004645,4645,Oxytetracycline,Terramycin|Oxatets
 CID000004666,4666,Paclitaxel,7-Epi Paclitaxel|C47H51NO14|RCINICONZNJXQF-UHFFFAOYSA-N
 CID000004674,4674,Pamidronic Acid,"pamidronate|Amidronate|Acide pamidronique|Acido pamidronico|Acidum pamidronicum|Ribodroat|AHPrBP|aminopropanehydroxydiphosphonate|amino-1-hydroxypropane-1,1-diphosphonate|M05BA03|Amino 1 hydroxypropane 1,1 diphosphonate|Aminohydroxypropylidene Diphosphonate|Aredia|Pamidronic acid (INN)|Pamidronicacid|C3H11NO7P2|Bisphosphonate 6|Ribodroat (TN)|amidronic Acid|Pamidronic acid?|Ibandronate Impurity 5|Ibandronate Impurity 5; Pamidronic Acid"
 CID000004675,4675,Pancuronium,
@@ -354,7 +354,7 @@ CID000004679,4679,Pantoprazole,Pantozol|Pantoprazol|Pantoprazolum|Pantoloc|Altop
 CID000004691,4691,Paroxetine,Paxetil|cis-(+)-Paroxetine Hydrochloride|Seroxat (Salt/Mix)|Paroxetine hydrochloride (Salt/Mix)
 CID000004723,4723,Pemoline,Phenoxazole|Azoksodon|Phenylisohydantoin|Tradon|Azoxodon|Dantromin|Fenoxazol|Cylert|Azoxodone|Centramin|Pemolin|Hyton|Deltamine|Kethamed|Sigmadyn|Tradone|Volital|Nitan|Okodon|Pioxol|Pondex|Ronyl|Sistra|Stimul
 CID000004727,4727,D-penicillamine,"Penicillamine|DL-Penicillamine|(+-)-Penicillamine|Valine, 3-mercapto-|2XOP7Y1H98|2-Amino-3-mercapto-3-methylbutanoic acid|3-Sulfanylvaline|DL-beta-Mercaptovaline|beta-Mercaptovaline|2-amino-3-methyl-3-sulfanylbutanoic acid|3,3-Dimethyl-DL-cysteine|2-Amino-3-mercapto-3-methylbutyric acid|3-Mercaptovaline|(+/-)-penicillamine|beta-Thiovaline|D-Penicyllamine|DL-Valine, 3-mercapto-|dl-beta,beta-Dimethylcysteine|DL-DMC|Penicillamine, (+/-)-|D-Mercaptovaline|DL-.beta.-Mercaptovaline|3,3-Dimethyl-D-cysteine|Penicillamin|D-Penicilamine|D-Penamine"
-CID000004730,4730,Penicillin,
+CID000004730,4730,Phenoxymethylpenicillin,Penicillin V|Penicillin VK|Ospen
 CID000004736,4736,Pentazocine,Talwin|dl-Pentazocine|Sosegon|Pentazocaine|PENTAZOCINE (+)|PENTAZOCINE (-)|Soseton|Talwan|Algopent (free base)|(.+/-.)-Pentazocine
 CID000004739,4739,Pentostatin,2'-Deoxycoformycin|Vidarbine|PD-ADI|Deaminase inhibitor (PD)|Vira A deaminase inhibitor|Deaminase inhibitor|2'-Dexoycoformycin|CI-825;Deoxycoformycin|dCF|FPVKHBSQESCIEP-UHFFFAOYSA-N
 CID000004740,4740,Pentoxifylline,"Trental|Oxpentifylline|Pentoxil|Pentoxyphylline|Pentoxiphyllin|1-(5-Oxohexyl)theobromine|Pentoxifilina|Oxypentifylline|Pentoxifyllinum|SD6QCT3TSU|C04AD03|pentoxifillina|Neotren mr|Trental 100|Trental 400|Pentoxifyllin|Torental|Vazofirin|Pentoxiphyllium|Pentoxyfylline|3,7-Dimethyl-1-(5-oxohexyl)xanthine|Dimethyloxohexylxanthine|Pentoxiphylline|Rentylin"
@@ -367,7 +367,7 @@ CID000004828,4828,Pindolol,Visken|Prinodolol|Betapindol|Carvisken|Calvisken|Dura
 CID000004829,4829,Pioglitazone,"Glustin|Zactos|Pioglitazona|Pioglitazonum|X4OV71U42S|U72,107A|A10BG03|Actos|pioglitazone (INN)|Pioglitazone (Actos)|Actos (TN)|Piozone|Pioglu|Pioglitazone?|Pioglitazone base|Pioglitazone (Standard)|Pioglitazone - Bio-X trade mark|HYAFETHFCAUJAY-UHFFFAOYSA-N"
 CID000004834,4834,Piperacillin,
 CID000004845,4845,Pirbuterol,Pirbuterolum|OG645J8RVW|pyrbuterol|pirbuterolo|(+-)-Pirbuterol|R03CC07|(+/-)-Pirbuterol|Pirbuterol (INN)|(+/-)-Pirbuterol; ARA 211|()-Pirbuterol; ARA 211|VQDBNKDJNJQRDG-UHFFFAOYSA-N
-CID000004856,4856,CID000004856,
+CID000004856,4856,Piroxicam,Feldene|Brexin
 CID000004873,4873,Potassium Chloride,Klotrix|Sylvite|Enseal|Slow-K|Muriate of potash|Neobakasal|Klor-Con|Acronitol|Chlorvescent|Potavescent|Kalitabs|Kaochlor|Pfiklor|Rekawan|Kloren|Chloropotassuril|Potassium monochloride|K-Contin|Kay Ciel|Steropotassium|K-Lease|Kalcorid|Kaleorid|Kaliduron
 CID000004885,4885,Pramipexole,(+/-)-Pramipexole|Pramipexole Base|()-Pramipexole
 CID000004889,4889,Pravastatin,Pravastatin Impurity A
@@ -428,7 +428,7 @@ CID000005394,5394,Temozolomide,Methazolastone|Temodar|Temodal|Temozolamide|Temoz
 CID000005401,5401,Terazosin,"Terazosine|Fosfomic|Terazosina|Blavin|Flumarc|Terazosinum|Terazosabb|Hytrinex|Vicard|G04CA03|terazosin, monohydrochloride, dihydrate|Vasomet|Hytrin|Terazosin (INN)|Terazosin (hydrochloride)|C19H25N5O4|Dysalfa|Adecur|Deflox|Prazosin Tetrahydro Impurity|Terazosabb (TN)|terazosin a|Apo-Terazosin"
 CID000005402,5402,Terbinafine,
 CID000005408,5408,Testosterone,"17-Hydroxyandrost-4-en-3-one|Oreton F|4-ANDROSTEN-17A-OL-3-ONE-2,2,4,6,6-D5|Neo-Hombreol F|Androst-4-en-17.beta.-ol-3-one|17.beta.-Hydroxy-4-androsten-3-one|17.beta.-Hydroxyandrost-4-en-3-one|.DELTA.4-Androsten-17.beta.-ol-3-one|Androst-4-en-3-one, 17.beta.-hydroxy-|17-Hydroxy-(17.beta.)-androst-4-en-3-one|4-Androsten-17?-ol-3-one-2,2,4,6,6-d5|MUMGGOZAMZWBJJ-UHFFFAOYSA-N|Testosterone- 16,16,17-D3|17beta-Hydroxy-3-oxo-4-androstene|9-BETA-10-ALPHA-TESTOSTERONE|.delta.(4)-Androsten-17.beta.-ol-3-one|WLN: L E5 B666 OV MUTJ A1 E1 FQ"
-CID000005412,5412,CID000005412,
+CID000005412,5412,Tetracycline,Achromycin|Sumycin
 CID000005426,5426,Thalidomide,Thalomid|Contergan|Pantosediv|Distaval|Softenon|Kevadon|Psychotablets|Algosediv|Calmorex|Neosedyn|Profarmil|Quetimid|Sedisperil|Imidene|Pangul|Talimol|Telagan|Imida-lab|Theophilcholine|Corronarobetin|Enterosediv|Gastrinide|Neaufatin|Nerosedyn
 CID000005453,5453,Thiotepa,"THIO-TEPA|Triethylenethiophosphoramide|Thiophosphamide|Thioplex|Tespamin|Tespamine|Tifosyl|Thiofozil|Girostan|Stepa|Oncotiotepa|TESPA|Thiotef|tepadina|Ledertepa|Tiotepa|Tris(1-aziridinyl)phosphine sulfide|Thiotriethylenephosphoramide|TIO TEF|Tepylute|Thiophosphamidum|Tris(ethylenimino)thiophosphate|Triethylene thiophosphoramide|N,N',N''-Triethylenethiophosphoramide"
 CID000005454,5454,Thiothixene,"Navan|CP-12,252-1 base|Thiothixene (USAN:USP)"
@@ -474,8 +474,8 @@ CID000005771,5771,Oxytocin,Oxytocin acetate salt hydrate|Oxytocin (Syntocinon)|O
 CID000005878,5878,Oxandrolone,Anavar|Lonavar|Vasorome|Oxandrin|Provitar|Protivar|Oxandrolona|Oxandrolonum|Oxandrolone ciii|7H6TM3CT4L|A14AA08|Ossandrolone|Oxandrin (TN)|Oxandrolone (1.0 mg/mL in Acetonitrile)|Oxandrolone (JAN/USP/INN)|Oxandrin;Anavar
 CID000005978,5978,Vincristine,"22-Oxovincaleukoblastine|Leurocristine|Vinkristin|Vincrystine|Vincristina|leucristine|vincristin|Tecnocris|Onco TCS|Oncovine|Oncotcs|Vincristinum|Vincaleukoblastine, 22-oxo-|Citomid|Farmistin|22-Oxovincaleukoblastin|L01CA02|5J49Q6B70F|Vinces|rel-Vincristine|C46H56N4O10|Vincristine (INN)|VIN|Vincrstine"
 CID000006691,6691,Warfarin,Coumafene|Zoocoumarin|Coumafen|Brumolin|Coumefene|Dethmor|Kumader|Warfarine|Kumadu|Vampirinip II|Coumarins|Kypfarin|Rodafarin|Solfarin|Dethnel|Kumatox|Maveran|Ratron|Rosex|Temus W|Vampirinip iii|Athrombine-K|Frass-Ratron|Mar-Frin
-CID000008953,8953,CID000008953,
-CID000009052,9052,CID000009052,
+CID000008953,8953,Sodium bicarbonate,sodium hydrogen carbonate|baking soda|bicarbonate
+CID000009052,9052,Acenocoumarol,Sintrom|Nicoumalone|Acenocoumarin
 CID000009433,9433,Aminophylline,Aminophyllin|Cardophyllin|Linampheta|Phyllocontin|Syntophyllin|Truphylline|Ethophylline|Somophyllin|Methophylline|Theophyllamine|Theophyllaminum|Variaphylline|Aminocardol|Cardiofilina|Cardiomin|Cardophylin|Cariomin|Diaphylline|Diophllin|Diuxanthine|Eurphyllin|Euufillin|Genophyllin|Grifomin
 CID000010631,10631,Medroxyprogesterone,Medroxyprogesteron|Medroxiprogesterona|Medroxyprogesteronum|Medrossiprogesterone|17-Hydroxy-6alpha-methylprogesterone|Farlutal inyectable|HSU1C9YRES|G03AC06|G03DA02|L02AB02|Methylhydroxyprogesterone|Medroxiprogesteronum|Medroxy Progesterone|Medroxyprogesterone (INN)|Medroxyprogesterone (Standard)|Hydroxymethylprogesterone|17-Hydroxy-6.alpha.-methylprogesterone|Farlutal inyectable (TN)|FRQMUZJSZHZSGN-HBNHAYAOSA-N|Opera_ID_433|17-Hydroxy-6a-methylprogesterone
 CID000012536,12536,Desonide,
@@ -541,7 +541,7 @@ CID000060877,60877,Emtricitabine,"Coviracil|Emtriva|524W91|dOTFC|BW-524W91|2-FTC
 CID000060953,60953,Capecitabine,"Xeloda|Capecitibine|Capiibine|Captabin|capecitabina|Capecytabine|Capecitabine Sun|Capecitabine Teva|Capecitabine Medac|Capecitabine Accord|capecitabinum|Capecitabin|Capecitabine 150mg|Capecitabine 500mg|Capecitabine Tablets, 150 mg|Capecitabine Tablets, 500 mg|L01BC06|Caxeta|Xabine|Xeloda (TN)|Capecitabine?|Capecitabine CRS|Capecitabine, API|Capecitabine (Standard)"
 CID000062924,62924,Milveterol+Fluticasone,fluticasone
 CID000064147,64147,Valganciclovir,"GCU97FKN3R|valganciclovirum|ganciclovir L-valyl ester|Ganciclovir L valyl Ester|J05AB14|Cymeval|L-Valine, ester with ganciclovir|Valganciclovir (INN)"
-CID000065027,65027,CID000065027,
+CID000065027,65027,Tipranavir,Aptivus
 CID000065999,65999,Telmisartan,Micardis|Pritor|Kinzalmono|Semintra|tolura|Telmisartan Teva|Telmisartan Actavis|BIBR-277-SE|BIBR-277SE|BIBR 277 SE|U5SYW473RQ|BIBR-277 SE|C09CA07|TELMISARTAN TEVA PHARMA|ONDUARP COMPONENT TELMISARTAN|TOLUCOMBI COMPONENT TELMISARTAN|KINZALKOMB COMPONENT TELMISARTAN|PRITORPLUS COMPONENT TELMISARTAN|MICARDISPLUS COMPONENT TELMISARTAN|telmisartanum|BIBR 277SE|C33H30N4O2|Kinzal|Tazlok
 CID000068740,68740,Zoledronic Acid,zoledronic|Zoledronate|Zometa|Reclast|Aclasta|Zoledronic Acid Anhydrous|Anhydrous Zoledronic Acid|70HZ18PH24|Zoledronic Acid Actavis|Acido zoledronico|Acide zoledronique|ZOLEDRONIC ACID TEVA GENERICS|CGP 42'446|CGP-42'446|Zerlinda|NDC-Zoledronate|acidum zoledronicum|CGP42'446|M05BA08|6XC1PAD3KF|Zoladrona acid mylan|Zoledronate hydrate|Zoledronic acid accord|Zoledronic acid medac
 CID000068844,68844,Brinzolamide,Azopt|Brinzolamida|AZARGA COMPONENT BRINZOLAMIDE|SIMBRINZA COMPONENT BRINZOLAMIDE|brinzolamidum|S01EC04|C12H21N3O5S3|Birnzolamide|BZ1|Brinzolamide (BRZ)|Azopt (TN)|Brinzolamide (JAN/USP/INN)|3znc|Brinzolamide (Standard)|Brinzolamide Impurity 31|Brinzolamide - Bio-X trade mark|HCRKCZRJWPKOAR-JTQLQIEISA-N
@@ -557,7 +557,7 @@ CID000077992,77992,Frovatriptan,Miguard|Allergo filmtabletten|H82Q2D5WA7|frovatr
 CID000077993,77993,Eletriptan,"eletriptanum|UK-116,044|22QOO9B8KI|UK-116,044-04 FREE BASE|N02CC06|UK-166,044|Eletriptan (INN)|C22H26N2O2S|Eletriptan, Free Base|GTPL40"
 CID000077999,77999,Rosiglitazone,"Rosiglizole|Rezult|rosiglitazona|Gaudil|Rosvel|rosiglitazonum|05V02F2KDG|TDZ-01|A10BG02|Avandia|Avandamet|Avandaryl|TDZ 01|Rosiglitazone base|Rosiglitazone (INN)|Rosigltazone|Gaudil (TN)|Rosiglitazone- Bio-X|Rosiglitazone (Standard)|Rosiglitazone - Bio-X trade mark|O-De-Me, 2-O-B-D-galactopyranoside|5-((4-(2-Methyl-2-(pyridinylamino)e|6P-065"
 CID000082146,82146,Bexarotene,"Targretin|Targrexin|bexaroteno|bexarotenum|L01XX25|3-methyl-TTNEB|Targretine|3-methyl TTNEB|Targretyn|Targret|Targretin (TN)|LG 69|Bexarotene (Standard)|Bexarotene, Free Acid|4k6i|Bexarotene oral(targretin)|Bexarotene (JAN/USAN/INN)|Bexarotene - Bio-X trade mark"
-CID000083786,83786,CID000083786,
+CID000083786,83786,Allopurinol,Zyloprim|Zyloric|Milurit
 CID000087177,87177,Maltulose,"4-O-alpha-D-Glucopyranosyl-D-fructose|Q7GN4HW47S|D-Fructose, 4-O-alpha-D-glucopyranosyl-|alpha-D-Glcp-(1->4)-beta-D-Fruf|d-fructose, 4-o-|A-d-glucopyranosyl-|4-O-Hexopyranosylhex-2-ulose"
 CID000091270,91270,Moexipril,Moexiprilum|WT87C52TJZ|Moex|C09AA13|Uniretic|Moexipril (INN)|UWWDHYUMIORJTA-HSQYWUDLSA-N
 CID000093860,93860,Bortezomib,"Bortezomib, (1S,2R)-|K6NMW4QRP5|(1S,2R)-Bortezomib|Bortezomib Impurity 5|C19H25BN4O4|Bortezomib Impurity (R,S-Isomer)|GXJABQQUPOEUTA-NVXWUHKLSA-N"
@@ -598,11 +598,11 @@ CID000197712,197712,Ambrisentan,"Ambrisentan, (A+-)-|(+-)-ambrisentan|ambrisenta
 CID000213039,213039,Darunavir,"Darunavirum|(-)-DARUNAVIR|Ethanolate, Darunavir|J05AE10|114, TMC|Prezista|Derunavir|2ien|2f8g|4ll3|C27H37N3O7S|DRV|Prezista(TM)|Darunavir (USAN/INN)|Darunavir?|2idw|3bvb|3cyw|3ekt|3ggu|3lzs|3lzu|3lzv|3ogp"
 CID000216239,216239,Sorafenib,"sorafenibum|9ZOQ3TZI87|L01XE05|sorafenib tosilate hydrate|Sorafenib free base|C21H16ClF3N4O3|Donafenib (Sorafenib D3)|Sorafenib (Nexavar)|BAX|1uwh|3gcs|3heg|4asd|Hit compound, 8|Sorafenib (Base)|Sorafenib, 4|Sorafenib (Standard)|Kinome_766|SORAFENIB BASE|Sorafenib (USAN/INN)|Nexavar (TN) (Bayer)|Sorafenib - Bio-X trade mark|Sorafenib for peak identification CRS"
 CID000216326,216326,Lenalidomide,Revlimid|Revimid|Lenalidomida|F0P408N6V4|IMiD3 cpd|lenalidomidum|L04AX04|Lenadoamide|C13H13N3O3|Revlimid (TN)|Lenalidomide?|Revimid;|Lenalidomide (Standard)|Revlimid (TN) (Celgene)|1-Benzyl-4-piperidinone Oxi|Lenalidomide (JAN/USAN/INN)|Lenalidomide - Bio-X trade mark
-CID000443871,443871,"(2R)-3-phenyl-2-[[(1S,3S)-3-propan-2-ylcyclohexanecarbonyl]amino]propanoic acid",
+CID000443871,443871,Nateglinide,Starlix
 CID000444013,444013,Gadoversetamide,Optimark|RLM74T3Z9D|Optimark In Plastic Container|Gadoversetamida|Gadoversetamidum|V08CA06|Optimark (TN)|Gadoversetamide (JAN/USP/INN)|Gadoversetamide (200 mg) (DISCONTINUED)
 CID000444033,444033,Ciclesonide,(RS)-Ciclesonide|Ciclesonide impurity C CRS
-CID000504578,504578,"(2S,3S,4R,5R,6R)-5-amino-6-[(2R,3S,4R,5S)-5-[(1R,2S,3R,6R)-3-amino-6-[(1S,2R,3R,4R,5R)-2-amino-5-(aminomethyl)-3,4-dihydroxycyclohexyl]oxy-2-hydroxycyclohexyl]oxy-4-hydroxy-2-(hydroxymethyl)oxolan-3-yl]oxy-2-(aminomethyl)oxane-3,4-diol",
-CID000508230,508230,2-(4-hydroxy-6-methoxy-7-methyl-3-oxo-1H-isobenzofuran-5-yl)acetic acid,C2-MPAcid
+CID000504578,504578,Neomycin,Framycetin|neomycin sulfate
+CID000508230,508230,Mycophenolic acid,Mycophenolate|CellCept|Myfortic|C2-MPAcid
 CID000657298,657298,Propylthiouracil,6-Propyl-2-thiouracil|Propacil|Prothyran|Procasil|Propycil|Prothiurone|Thiuragyl|Prothiucil|Protiural|Prothycil|Propyl-Thiorist|Propyl-Thyracil|6-Propylthiouracil|Thyreostat II|Propylthiorit|Propythiouracil|Propilthiouracil|Propyl-Thiorit|Propylthiouracile|6-Thio-4-propyluracil|Propiltiouracilo|4-Propyl-2-thiouracil|Propylthiouracilum|2-Mercapto-6-propyl-4-pyrimidone
 CID000667490,667490,Mercaptopurine,"6-Mercaptopurine|Mercapurin|6-Thiopurine|6-Thioxopurine|9H-Purine-6-thiol|6-Mercaptopurin|Puri-Nethol|6-Thiohypoxanthine|1,9-dihydro-6H-purine-6-thione|Mercaptopurin|3,7-dihydropurine-6-thione|Hypoxanthine, thio-|1,7-Dihydro-6H-purine-6-thione|Mercaptopurina|Mercaptopurinum|Merkaptopuryna|Mercaptopurine anhydrous|Xaluprine|9H-Purine-6(1H)-thione|6-Merkaptopurin|Purine, 6-mercapto-|7-Mercapto-1,3,4,6-tetrazaindene|1H-Purine, 6-mercapto-|Purixan"
 CID001349907,1349907,Methimazole,thiamazole|Tapazole|1-Methyl-1H-imidazole-2-thiol|Methimazol|1-Methylimidazole-2-thiol|Mercazolyl|Thiamazol|Mercazole|Thymidazol|Thymidazole|Favistan|Mercaptazole|Metothyrine|Metazolo|Metothyrin|Strumazol|Thycapzol|Danantizol|Frentirox|Merkazolil|Metotirin|Thacapzol|Basolan|Mercasolyl
@@ -610,8 +610,8 @@ CID003002190,3002190,Telithromycin,Ketek|Levviax|telithromycine|telitromicina|KI
 CID003062316,3062316,Dasatinib,"Sprycel|Dasatinib anhydrous|Dasatinib (anhydrous)|dasatinibum|anh. dasatinib|anhydrous dasatinib|dasatinib (anh.)|BMS Dasatinib|X78UG0A0RN|JLTN compound|PHYRAGO|L01XE06|C22H26ClN7O2S|Dasatanib|1N1|Dasatinib (Standard)|Dasatinib (JAN/INN)|Sprycel (Bristol Meyers)|Dasatinib - Bio-X trade mark|EX-A401|5-Thiazolecarboxamide, monohydrate"
 CID003081884,3081884,Glatiramer,copolymer|Glatiramer (acetate)|Glatirameracetat|Galtiramer acetate|FHEAIOHRHQGZPC-KIWGSFCNSA-N|C25H45N5O13|Glatiramer acetate - Bio-X trade mark
 CID003085017,3085017,Sevelamer,Sevelamer (INN)|Renagel (TN)|ZNSIZMQNQCNRBW-UHFFFAOYSA-N
-CID003086258,3086258,"3-[18-(2-Carboxyethyl)-8-ethyl-13-(1-hydroxyethyl)-3,7,12,17-tetramethyl-22,23-dihydroporphyrin-2-yl]propanoic acid",
-CID003468412,3468412,"20-[(3-Amino-3,6-dideoxyhexopyranosyl)oxy]-4,6,8,11,12,16,18,36-octahydroxy-35,37,38-trimethyl-2,14-dioxo-1-oxacyclooctatriaconta-21,23,25,27,31,33-hexaene-17-carboxylic acid",
+CID003086258,3086258,Porfimer,Photofrin|hematoporphyrin
+CID003468412,3468412,Nystatin,Mycostatin|Nilstat
 CID004183806,4183806,Mesoprostal,"Misoprostol, 1% in cellulose|8-iso Misoprostol|Misoprostol CRS|Misoprostol for system suitability CRS"
 CID004475485,4475485,Rosuvastatin,Rosuvastatin EP Impurity L
 CID004479097,4479097,Hydroxocobalamin,
@@ -619,14 +619,14 @@ CID004659568,4659568,Entacapone,Entacapone Sodium|JRURYQJSLYLRLN-UHFFFAOYSA-N
 CID004659569,4659569,Tolcapone,Tasmar|Tolcapona|N04BX01|Tolcaponum|TOLCAPONE (USP MONOGRAPH)|Talcapone|Tasmar (TN)|Tolcapone?|MIQPIUSUKVNLNT-UHFFFAOYSA-N|TCW|Tolcapone (Standard)|Tolcapone (JAN/USP/INN)|Tolcapone - Bio-X trade mark|3s68
 CID005281007,5281007,Dacarbazine,"DTIC|DTIC-Dome|Deticene|Biocarbazine R|Decarbazine|ICDMT|ICDT|Dacarbazinum|Imidazole carboxamide|Dacarbasine|Dicarbazine|Di-me-triazenoimidazolecarboxamide|(Dimethyltriazeno)imidazolecarboxamide|dacarbazina|7GR28W0FJI|Carboxamide, Dimethyl Imidazole|Dacatic|DTICDome|Dakarbazin|DTIC Dome|Dimethyl Triazeno Imidazole Carboxamide|Imidazole Carboxamide, Dimethyl|Asercit|Detimedac"
 CID005281104,5281104,Paricalcitol,"Zemplar|19-Nor-1alpha,25-dihydroxyvitamin D2|19-Nor-1,25-(OH)2D2|paricalcitolum|H05BX02|Zemplar (TN)|Paracalcin|19-Nor-1-alpha,25-dihydroxyvitamin D2|Paricalcitol (Standard)|Paricalcitol (JAN/USP/INN)"
-CID005282044,5282044,CID005282044,
+CID005282044,5282044,Tigecycline,Tygacil
 CID005282226,5282226,Travoprost,"Travatan|Travatan Z|Izba|Otx-tp|travoprostum|IDOSE TR|WJ68R08KX9|DUOTRAV COMPONENT TRAVOPROST|Z, Travatan|Travoprost Ophthalmic|Travoprost Intracameral|Travoprost (Isomer Free)|Travoprost Ophthalmic Solution|S01EE04|Travoprost Ophthalmic Solution, 0.004%|Travaprost|Travatan (TN)|C26H35F3O6|Travatanz|Fluprostenol isopropyl ester|Trovoprost|15S-Travoprost|(+)-Fluprostenol isopropyl ester|Flu-Ipr"
 CID005311027,5311027,Bimatoprost,Lumigan|Latisse|Prostamide|bimatoprostum|DURYSTA|GANFORT COMPONENT BIMATOPROST|S01EE03|Lumigan (TN)|Bimatoprost in bulk|Lumiga   n|Latisse (TN)|ZOLYMBUS|(5Z)-BIMATOPROST|Bimatoprost (JAN/USAN/INN)|17-Phenyltrinor-PGF2alpha Ethylamide|15M
 CID005311039,5311039,Caspofungin,Gaspofungin Impurity F
 CID005311048,5311048,Dichloromethanediamine,
 CID005311082,5311082,Eptifibatide,
 CID005311181,5311181,Iloprost,Ciloprost|Ventavis|Endoprost|Ilomedin|Aurlumyn|Iloprostum|JED5K35YGL|Iloprost Clathrate|B01AC11|5-cis Iloprost|Ventavis (TN)|Cilaprost|Ilomedine|Iloprost (Standard)|Iloprost (USAN/INN)|HIFJCPQKFCZDDL-ACWOEMLNSA-N
-CID005311297,5311297,2-[2-[(3R)-3-[3-[(E)-2-(7-chloroquinolin-2-yl)ethenyl]phenyl]-3-sulfanylpropyl]phenyl]propan-2-ol,
+CID005311297,5311297,Montelukast,Singulair
 CID005329102,5329102,Sunitinib,sunitinibum|L01XE04|Sutent|Sunitinib Base|Sunitinib (INN)|Sunitinib (free base)|Sunitinib base?|(Z)-Sunitinib|Sutent (free base)|Sunitinib (Standard)|EX-A553|WINHZLLDWRZWRT-ATVHPVEESA-N|Sunitinib base - Bio-X trade mark
 CID005353980,5353980,Sulfasalazine,Salicylazosulfapyridine|Sulphasalazine|Azulfidine|Salazosulfapyridine|Salazopyrin|Benzosulfa|Sulcolon|Asulfidine|Azopyrine|Salazopyridin|Accucol|Azopyrin|Salisulf|Salazopiridazin|Reupirin|w-t Sasp oral|Colo-Pleon|Salazosulfapyridin|Sulfasalazina|Sulfasalazin|Sulfasalazinum|Sulfazalazine|Azulfidine EN-tabs|Azulfidine EN
 CID005362070,5362070,Balsalazide,Balsalazido|Balsalazida|Balsalazidum|Balsalazide Disodium|Colazal|Giazo|Colazide|Balsalazide (INN)|C17H15N3O6|P80AL8J7ZP|Balsalazide-d3DisodiumSalt|Balsalazide-d|Balsalazide(Z/E-Isomers)|IPOKCKJONYRRHP-UHFFFAOYSA-N|(E)-5-((4-(((2-Carboxyethy
@@ -637,7 +637,7 @@ CID005481350,5481350,Tenofovir Disoproxil,Bis(POC)PMPA|(r)-bis(poc)pmpa|bis-POC-
 CID005487301,5487301,Tegaserod,tegaserodum|SDZ-HTF-919|SDZ HTF-919|A06AX06|Zelnorm|Zelmac|SDZ HTF 919|Tegaserod (USAN/INN)|Tegaserod Impurity 1|Tegaserod (maleate)?
 CID005493381,5493381,Deferasirox,"Exjade|Deferasiroxum|Jadenu|Osveral|Jadenu Sprinkle|Deferasorox|V8G4MOF2V9|Deferasirox Oral Granules|Deferasirox oral|V03AC03|C21H15N3O4|Deferasirox CRS|Exjade (TN)|Jadenu (TN)|DEFERASI|Deferasirox (Exjade)|Deferasirox (Exjade)?|Deferasirox (Standard)|Deferasirox, ICL670|Deferasirox (ICL670)|Deferasirox (JAN/USAN/INN)|Deferasirox for system suitability CRS|JBL"
 CID005493444,5493444,Aliskiren,aliskirene|Aliskireno|502FWN4Q32|aliskirenum|C09XA02|C30H53N3O6|Aliskiren?|Rasilez (TN)|Aliskiren (Standard)|Aliskiren-hemifumarate|Aliskiren (USAN/INN)|UXOWGYHJODZGMF-QORCZRPOSA-N|C41
-CID006398525,6398525,Cid 6398525,
+CID006398525,6398525,Sucralfate,Carafate|Sulcrate
 CID006398970,6398970,Cefdinir,Cefdinir (Omnicef)
 CID006435110,6435110,Ivermectin,Equimectrin|Alverin Plus for Cattle|Endo-Mectin for Cattle and Swine|Ivermectine (INN-French)|Ivermectinum (INN-Latin)|Ivermectino (INN-Spanish)|Ivermectin (USAN:USP:INN:BAN)|Heartgard-30|Cardotek-30
 CID006436173,6436173,Rifaximin,"Rifaxidin|Rifacol|Xifaxan|Rifamycin L 105|Rifaximine|Rifaximina|Normix|Rifamycin L 105SV|Rifaximinum|Xifaxsan|Xifaxanta|L36O5T016N|Targaxan|A07AA11|D06AX11|Rifamixin|C43H51N3O11|Fatroximin|Ritacol|Rifaxin|RedActiv|28,30,32-undecaen-13-yl acetate|L 105SV|L 105 (Ansamacrolide antibiotic)"

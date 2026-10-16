@@ -15,7 +15,6 @@ heart failure,cardiac
 myocardial infarction,cardiac
 bradycardia,cardiac
 heart block,cardiac
-hypotension,cardiac
 renal failure,renal
 kidney failure,renal
 acute kidney,renal
@@ -24,7 +23,6 @@ hepatic failure,hepatic
 liver failure,hepatic
 hepatitis,hepatic
 hepatotoxicity,hepatic
-jaundice,hepatic
 rhabdomyolysis,musculoskeletal
 serotonin syndrome,neurologic
 neuroleptic malignant,neurologic
@@ -56,4 +54,44 @@ lactic acidosis,metabolic
 pancreatitis,gastrointestinal
 gastrointestinal perforation,gastrointestinal
 sepsis,infection
-death,fatal
+bleed,bleeding
+thromboses,thrombotic
+embolism,thrombotic
+infarction,cardiac
+heart attack,cardiac
+asystole,cardiac
+septic shock,infection
+epidermal necrolysis,skin
+status epilepticus,neurologic
+respiratory distress,respiratory
+pulmonary oedema,respiratory
+pulmonary edema,respiratory
+antibody,exclude
+antigen,exclude
+positive,exclude
+negative,exclude
+test,exclude
+rna,exclude
+dna,exclude
+carrier,exclude
+scale,exclude
+volume,exclude
+prophylaxis,exclude
+death of,exclude
+fear,exclude
+cell death,exclude
+bleeding time,exclude
+withdrawal bleeding,exclude
+site,exclude
+procedural,exclude
+operative,exclude
+postoperative,exclude
+unawareness,exclude
+signs and symptoms,exclude
+neonatal,exclude
+traumatic,exclude
+control,exclude
+hereditary,exclude
+peripartum,exclude
+antepartum,exclude
+coital,exclude

@@ -1,0 +1,27 @@
+case,drugs,interacting_pair,expected,mechanism
+1,warfarin|ibuprofen|acetaminophen,warfarin|ibuprofen,bleeding,NSAID antiplatelet effect + GI mucosal injury on top of anticoagulation
+2,warfarin|aspirin|omeprazole,warfarin|aspirin,bleeding,anticoagulant + antiplatelet
+3,clopidogrel|aspirin|atorvastatin,clopidogrel|aspirin,bleeding,dual antiplatelet therapy
+4,warfarin|ciprofloxacin|metoprolol,warfarin|ciprofloxacin,bleeding,fluoroquinolone raises INR (CYP1A2 inhibition / gut flora)
+5,warfarin|fluconazole|amlodipine,warfarin|fluconazole,bleeding,fluconazole inhibits CYP2C9 (S-warfarin)
+6,diclofenac|citalopram|amlodipine,diclofenac|citalopram,bleeding,SSRI platelet serotonin depletion + NSAID
+7,ibuprofen|lisinopril|furosemide,ibuprofen|lisinopril,kidney,"""triple whammy"": NSAID + ACE inhibitor + loop diuretic"
+8,diclofenac|losartan|hydrochlorothiazide,diclofenac|losartan,kidney,"""triple whammy"": NSAID + ARB + thiazide"
+9,spironolactone|lisinopril|metformin,spironolactone|lisinopril,hyperkalaemia,potassium-sparing diuretic + ACE inhibitor
+10,spironolactone|losartan|amlodipine,spironolactone|losartan,hyperkalaemia,potassium-sparing diuretic + ARB
+11,verapamil|metoprolol|atorvastatin,verapamil|metoprolol,bradycardia,additive AV-node depression (non-DHP CCB + beta blocker)
+12,diltiazem|propranolol|omeprazole,diltiazem|propranolol,bradycardia,additive AV-node depression (non-DHP CCB + beta blocker)
+13,digoxin|amiodarone|furosemide,digoxin|amiodarone,arrhythmia,amiodarone raises digoxin levels (P-gp inhibition)
+14,simvastatin|clarithromycin|omeprazole,simvastatin|clarithromycin,rhabdomyolysis,CYP3A4 inhibition raises simvastatin exposure
+15,simvastatin|amiodarone|metformin,simvastatin|amiodarone,rhabdomyolysis,CYP3A4 inhibition raises simvastatin exposure
+16,atorvastatin|erythromycin|acetaminophen,atorvastatin|erythromycin,rhabdomyolysis,CYP3A4 inhibition raises atorvastatin exposure
+17,glibenclamide|fluconazole|amlodipine,glibenclamide|fluconazole,hypoglycaemia,fluconazole inhibits CYP2C9 metabolism of the sulfonylurea
+18,glipizide|ciprofloxacin|metoprolol,glipizide|ciprofloxacin,hypoglycaemia,fluoroquinolone dysglycaemia + sulfonylurea
+19,methotrexate|trimethoprim|omeprazole,methotrexate|trimethoprim,myelosuppression,additive antifolate effect
+20,methotrexate|ketorolac|prednisone,methotrexate|ketorolac,myelosuppression,NSAID reduces renal clearance of methotrexate
+21,oxycodone|diazepam|acetaminophen,oxycodone|diazepam,cns_respiratory_depression,opioid + benzodiazepine (FDA boxed warning)
+22,morphine|alprazolam|omeprazole,morphine|alprazolam,cns_respiratory_depression,opioid + benzodiazepine (FDA boxed warning)
+23,tramadol|sertraline|acetaminophen,tramadol|sertraline,seizure_serotonin,serotonin syndrome and lowered seizure threshold
+24,tramadol|fluoxetine|omeprazole,tramadol|fluoxetine,seizure_serotonin,serotonin syndrome and lowered seizure threshold (CYP2D6)
+25,sildenafil|isosorbide|atorvastatin,sildenafil|isosorbide,hypotension,PDE5 inhibitor + nitrate (contraindicated)
+26,haloperidol|citalopram|omeprazole,haloperidol|citalopram,arrhythmia,additive QT prolongation

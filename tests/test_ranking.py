@@ -67,6 +67,18 @@ def test_serious_keywords_match_whole_words() -> None:
     assert not names.is_serious("glaucoma")
 
 
+def test_serious_labels_win_and_keywords_handle_plurals_and_exclusions() -> None:
+    names = NameIndex(
+        {}, {}, {}, ["thrombosis", "coma", "agranulocytosis"],
+        serious_labels={"heart attack": True, "coma": False},
+        exclude_keywords=["scale"],
+    )
+    assert names.is_serious("Heart attack")  # IME label, no keyword needed
+    assert not names.is_serious("coma")  # the label overrides the keyword
+    assert names.is_serious("deep vein thromboses")  # plural of a keyword
+    assert not names.is_serious("glasgow coma scale")  # excluded lab scale
+
+
 def test_tier3_labels_must_come_from_pair_candidates(tmp_path: Path) -> None:
     targets = tmp_path / "targets.csv"
     ppi = tmp_path / "ppi.csv"

@@ -17,6 +17,14 @@ Sinh tự động bởi `python eval/run_offline.py` và `python eval/run_accura
 
 ![E1](figures/e1_resolver.png)
 
+## E2. Trích thuốc từ câu chat
+
+30 câu chat thực tế (biệt dược, hàm lượng, sai chính tả, tiếng Anh, có từ thừa như "vitamin C", "rượu bia", triệu chứng). Đây là đường đi thật của giao diện chat.
+
+| Đúng cả câu | Precision thuốc | Recall thuốc | Thuốc nhận nhầm | Thuốc bỏ sót | Câu hỏi lại |
+|---|---|---|---|---|---|
+| 100.0% | 100.0% | 100.0% | 0 | 0 | 2 |
+
 ## A1. Độ trung thực của kết quả so với dữ liệu gốc
 
 200 phác đồ ngẫu nhiên (3–6 thuốc). Mọi kết quả được đối chiếu lại với các file CSV gốc, đọc độc lập với cache SQLite.
@@ -90,6 +98,61 @@ Dự đoán hợp lệ và dự đoán bị làm sai có chủ đích (ID bằng
 | Nhãn Tier 3 ngoài ứng viên | 73 | loại | 0 | 73 | 100.0% |
 | Sai nhãn tác dụng phụ | 227 | loại | 0 | 227 | 100.0% |
 | Sai tier | 300 | loại | 0 | 300 | 100.0% |
+
+## A5. Benchmark tương tác thuốc kinh điển
+
+26 ca tương tác đã được xác lập lâm sàng (`eval/clinical_benchmark.csv`), mỗi ca gồm cặp tương tác và một thuốc thứ ba. Đo vị trí tác dụng phụ mong đợi trong danh sách nghiêm trọng (hệ thống hiển thị 10 mục đầu).
+
+| Cách xếp hạng | Ca có dữ liệu | Hit@3 | Hit@10 | MRR |
+|---|---|---|---|---|
+| Chỉ từ khóa | 26 | 30.8% | 53.8% | 0.241 |
+| IME | 26 | 15.4% | 42.3% | 0.1566 |
+| IME + đe dọa tính mạng (mặc định) | 26 | 23.1% | 53.8% | 0.2219 |
+| IME + đe dọa tính mạng, bỏ IDF | 26 | 15.4% | 50.0% | 0.1769 |
+
+![A5](figures/a5_clinical_benchmark.png)
+
+| Ca | Phác đồ | Mong đợi | Hạng (mặc định) |
+|---|---|---|---|
+| 1 | warfarin + ibuprofen + acetaminophen | chảy máu | 2 |
+| 2 | warfarin + aspirin + omeprazole | chảy máu | 9 |
+| 3 | clopidogrel + aspirin + atorvastatin | chảy máu | 13 |
+| 4 | warfarin + ciprofloxacin + metoprolol | chảy máu | 11 |
+| 5 | warfarin + fluconazole + amlodipine | chảy máu | 2 |
+| 6 | diclofenac + citalopram + amlodipine | chảy máu | 1 |
+| 7 | ibuprofen + lisinopril + furosemide | suy thận | 6 |
+| 8 | diclofenac + losartan + hydrochlorothiazide | suy thận | 33 |
+| 9 | spironolactone + lisinopril + metformin | tăng kali máu | 29 |
+| 10 | spironolactone + losartan + amlodipine | tăng kali máu | 4 |
+| 11 | verapamil + metoprolol + atorvastatin | nhịp chậm / block tim | 6 |
+| 12 | diltiazem + propranolol + omeprazole | nhịp chậm / block tim | 5 |
+| 13 | digoxin + amiodarone + furosemide | loạn nhịp | 1 |
+| 14 | simvastatin + clarithromycin + omeprazole | tiêu cơ vân | 30 |
+| 15 | simvastatin + amiodarone + metformin | tiêu cơ vân | 4 |
+| 16 | atorvastatin + erythromycin + acetaminophen | tiêu cơ vân | 6 |
+| 17 | glibenclamide + fluconazole + amlodipine | hạ đường huyết | 26 |
+| 18 | glipizide + ciprofloxacin + metoprolol | hạ đường huyết | 31 |
+| 19 | methotrexate + trimethoprim + omeprazole | ức chế tủy | 28 |
+| 20 | methotrexate + ketorolac + prednisone | ức chế tủy | 17 |
+| 21 | oxycodone + diazepam + acetaminophen | ức chế thần kinh / hô hấp | 2 |
+| 22 | morphine + alprazolam + omeprazole | ức chế thần kinh / hô hấp | 7 |
+| 23 | tramadol + sertraline + acetaminophen | co giật / serotonin | 104 |
+| 24 | tramadol + fluoxetine + omeprazole | co giật / serotonin | 25 |
+| 25 | sildenafil + isosorbide + atorvastatin | tụt huyết áp | không nằm trong nhóm nghiêm trọng |
+| 26 | haloperidol + citalopram + omeprazole | loạn nhịp | 3 |
+
+**Diễn giải.** Decagon chỉ cho biết một tác dụng phụ *có* được báo cáo cho cặp thuốc hay không, không có tần suất hay mức độ, nên điểm xếp hạng không phân biệt được tác dụng phụ đặc trưng của tương tác với hàng trăm tác dụng phụ khác của cùng cặp. Khoảng một nửa số ca kinh điển lên được top 10. Thử thêm chuẩn hoá theo độ đặc trưng của thuốc (kiểu PRR) cũng không cải thiện ổn định, nên trọng số không được chỉnh theo bộ 26 ca này để tránh overfit. Hướng cải thiện: dùng số lượng báo cáo FAERS để tính disproportionality thật.
+
+## A6. Phân loại tác dụng phụ nghiêm trọng
+
+Chuẩn tham chiếu: danh sách *Important Medical Event* (IME) của EMA, MedDRA 29.1 (`scripts/build_serious_effects.py`). 244 / 1317 tác dụng phụ phối hợp được gắn nghiêm trọng; ung thư, dị tật bẩm sinh, thai sản, nhiễm trùng cộng đồng và bệnh mạn tính bị loại vì trong FAERS chúng thường là chỉ định hay bệnh nền. Bảng dưới so cách dùng từ khóa với IME trên các tên khớp trực tiếp một thuật ngữ IME.
+
+| Phương pháp | Số tên | IME nghiêm trọng | Precision | Recall | F1 |
+|---|---|---|---|---|---|
+| Từ khóa cũ (khớp nguyên từ) | 2998 | 1699 | 0.8894 | 0.1042 | 0.1865 |
+| Từ khóa mới (số nhiều + loại trừ) | 2998 | 1699 | 0.9164 | 0.1548 | 0.2649 |
+
+**Diễn giải.** Từ khóa chính xác (precision cao) nhưng chỉ bắt được một phần nhỏ (recall thấp) các tác dụng phụ IME, và bỏ sót tên thông dụng như "heart attack", "gastrointestinal bleed", "deep vein thromboses". Vì vậy hệ thống dùng nhãn IME làm chính; từ khóa chỉ dùng cho tên chưa ánh xạ được và để ưu tiên nhóm đe dọa tính mạng khi xếp hạng.
 
 ## E3. Dự đoán của LLM qua được validator
 

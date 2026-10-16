@@ -577,6 +577,7 @@ class DecagonGraph:
         drugs: list[str],
         is_serious: Callable[[str], bool] | None = None,
         weights: RankingWeights | None = None,
+        is_critical: Callable[[str], bool] | None = None,
     ) -> tuple[dict[str, object], list[Evidence]]:
         targets_by_drug = {drug: self.targets.get(drug, set()) for drug in drugs}
         regimen_targets = set().union(*targets_by_drug.values()) if drugs else set()
@@ -606,6 +607,7 @@ class DecagonGraph:
             self.mono_codes,
             is_serious,
             weights,
+            is_critical,
         )
         # Order each pair's effects by the regimen-level score so that the
         # bounded evidence sample keeps the most relevant effects first.

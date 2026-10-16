@@ -35,7 +35,7 @@ Ràng buộc kỹ thuật:
 
 | Bổ sung | Cách làm | Kết quả |
 |---|---|---|
-| Tên thuốc | STITCH `CID0…` → PubChem CID; dự phòng bằng tên SIDER; sửa tay có ghi bằng chứng | 634/645 thuốc có tên |
+| Tên thuốc | STITCH `CID0…` → PubChem CID; dự phòng bằng tên SIDER; sửa tay có ghi bằng chứng | 645/645 thuốc có tên (18 CID đã bị PubChem gộp được tra qua "Preferred Compound" và công thức phân tử, ghi bằng chứng trong `drug_name_overrides.csv`) |
 | Biệt dược Việt Nam | Bảng viết tay, có script kiểm tra | 123 biệt dược, 0 lỗi |
 | Tên gene | NCBI `Homo_sapiens.gene_info` | 18,941/19,089 gene |
 | Tiếng Việt | Agent dịch trực tiếp, không gọi API | 1,317 tên phối hợp + 1,320 tên đơn lẻ có hiện trên UI |
@@ -101,6 +101,7 @@ polypharmacy-graph-rag/
 - Chuẩn hóa chuỗi nhập: bỏ dấu, bỏ hàm lượng ("500mg", "250"), bỏ dạng bào chế và tên muối ("kali", "natri", "HCl").
 - Fuzzy chỉ tự nhận khi điểm ≥ 90, độ giống ký tự ≥ 92 và ứng viên thứ nhất bỏ xa ứng viên thứ hai. Nếu không, hệ thống hỏi lại người dùng.
 - Ví dụ: "esomeprazole" không bao giờ bị nhận thành Omeprazole, "Vitamin C" không bị nhận thành Ergocalciferol.
+- Trong câu chat, một từ đơn chỉ được nhận là thuốc nếu là tên chính, biệt dược đã soát, hoặc đồng nghĩa ≥ 5 ký tự. Viết tắt PubChem ngắn ("CoM") và từ thông dụng ("vitamin", "delta") không được tự khớp: trước đây "ăn cơm" bị nhận thành Mesna.
 
 **Hiển thị:** không cho người dùng chọn số lượng. Hệ thống hiện tối đa `MAX_SERIOUS_EFFECTS` = 10 tác dụng phụ nghiêm trọng có điểm cao nhất. Tối đa `MAX_OTHER_EFFECTS` = 5 tác dụng phụ khác nằm trong một mục thu gọn.
 
@@ -110,10 +111,17 @@ polypharmacy-graph-rag/
 score = 1.0·recurrence   (số cặp trong phác đồ cùng ghi nhận)
       + 0.5·idf          (log(tổng số cặp / số cặp có tác dụng phụ này))
       + 1.0·not_in_mono  (không có trong mono của thuốc nào trong cặp)
-      + 2.0·serious      (khớp nguyên từ trong serious_keywords.csv)
+      + 2.0·serious      (Important Medical Event của EMA, resources/serious_effects.csv)
+      + 2.0·critical     (nghiêm trọng VÀ thuộc nhóm đe dọa tính mạng trong serious_keywords.csv)
       + 1.0·amplified    (Tier 2)
 ```
 Các trọng số đặt trong `.env`. Tier 2 chỉ áp cho đúng các cặp khuếch đại (`amplified_pairs`).
+
+**Thế nào là "nghiêm trọng"**
+- Chuẩn: danh sách *Important Medical Event* (IME) của EMA (MedDRA 29.1). `scripts/build_serious_effects.py` ánh xạ từng tên Decagon sang thuật ngữ MedDRA: khớp chính xác sau chuẩn hóa (Anh–Mỹ, số nhiều), khớp khi đảo thứ tự từ, hoặc qua `resources/effect_meddra_map.csv` cho tên thông dụng ("heart attack" → Myocardial infarction). Có trong IME mới là nghiêm trọng.
+- Loại các thuật ngữ IME mà FAERS thường ghi như chỉ định hay bệnh nền: ung thư, dị tật bẩm sinh, thai sản, nhiễm trùng cộng đồng (viêm gan B/C, giang mai…), bệnh mạn tính (viêm khớp dạng thấp, đa xơ cứng…).
+- Tên không ánh xạ được thì dùng từ khóa (`serious_keywords.csv`), có nhận số nhiều và loại trừ xét nghiệm, thủ thuật ("glasgow coma scale", "hepatitis B antibody positive").
+- Trước đây chỉ dùng từ khóa nên bỏ sót "gastrointestinal bleed", "heart attack", "Embolism pulmonary", "deep vein thromboses", "septic shock" và gắn nhầm "Hepatitis C antibody positive", "heat stroke" (đánh giá A6).
 
 **Tier 3**
 - Nhãn chỉ được chọn trong danh sách ứng viên của chính cặp đó. Ứng viên là các tác dụng phụ mỗi thuốc đã có với những thuốc khác; ưu tiên nhãn chung của cả hai, rồi theo tổng số lần.
@@ -138,19 +146,24 @@ Các trọng số đặt trong `.env`. Tier 2 chỉ áp cho đúng các cặp kh
 | A2 | Cầu protein có dự đoán được cặp có tương tác? | AUROC 0.543 (gần ngẫu nhiên 0.495); baseline độ phổ biến 0.943. Cầu có ở 95.7% số cặp → Tier 3 chỉ là giả thuyết cơ chế |
 | A3 | Dự đoán từng tác dụng phụ, giao thức Decagon (963 TDP ≥ 500 cặp) | AUROC 0.951, AUPRC 0.940, AP@50 0.966; baseline độ phổ biến 0.908/0.889/0.883; Decagon công bố 0.872/0.832/0.803 (giao thức khác, chỉ tham chiếu) |
 | A4 | Validator với dự đoán bị làm sai có chủ đích | Loại 950/950 dự đoán sai, giữ 300/300 dự đoán hợp lệ |
+| E2 | Trích thuốc từ 30 câu chat (`eval/extract_cases.csv`) | Đúng 30/30 câu, precision = recall thuốc = 100%, 2 câu hỏi lại |
+| A5 | 26 tương tác kinh điển (`eval/clinical_benchmark.csv`) | Hit@10 53.8%, Hit@3 23.1%, MRR 0.22; ngang phương án chỉ dùng từ khóa (53.8% / 30.8%); chỉ IME không cộng nhóm đe dọa tính mạng: 42.3% |
+| A6 | Phân loại "nghiêm trọng" so với IME (2,998 tên) | Từ khóa cũ precision 0.89 / recall 0.10; từ khóa mới 0.92 / 0.15 → hệ thống dùng nhãn IME |
 
 Chi tiết, bảng và hình cho report: `eval/results/ACCURACY.md`.
 
-**Kiểm tra tính đúng trên dữ liệu thật** (đối chiếu trực tiếp với CSV gốc):
-- Mọi cặp và tác dụng phụ trả về đều có trong `bio-decagon-combo.csv`: 0 lỗi trên 4 phác đồ.
-- Tier 2 chỉ gắn cho cặp có protein đích chung với ≥ 3 thuốc: 0 lỗi.
-- Đường dẫn Tier 3 được kiểm từng cạnh với targets/PPI, ví dụ Bisoprolol → ADRB1 ↔ GCG ↔ CHRM3 ← Loratadine.
-
 ---
 
-## 5. Việc còn lại
+## 5. Giới hạn đã đo được
+
+- **Xếp hạng (A5):** khoảng một nửa số tương tác kinh điển lên top 10. Decagon không có tần suất hay mức độ, nên không phân biệt được tác dụng phụ đặc trưng của tương tác với hàng trăm tác dụng phụ khác của cùng cặp. Tụt huyết áp (sildenafil + nitrat) không nằm trong IME nên không hiện ở nhóm nghiêm trọng.
+- **Tier 3 (A2):** cầu protein có ở ~96% số cặp và gần như không dự đoán được tương tác; chỉ dùng làm giả thuyết cơ chế.
+- **A3 so với Decagon:** cặp âm ngẫu nhiên dễ phân biệt (baseline độ phổ biến đã đạt 0.91), nên không kết luận là tốt hơn mô hình GCN.
+
+## 6. Việc còn lại
 
 - [ ] Chạy thử với LLM thật và soát chất lượng giải thích.
 - [ ] E3 (khoảng 10 request).
-- [ ] Người có chuyên môn soát bản dịch, ưu tiên các tác dụng phụ có dấu ⚠.
+- [ ] Người có chuyên môn soát bản dịch và bảng ánh xạ `effect_meddra_map.csv`.
 - [ ] Sửa số liệu trong report theo mục 1.
+- [ ] Nếu có số lượng báo cáo FAERS: thay IDF bằng disproportionality (PRR/ROR) để xếp hạng.

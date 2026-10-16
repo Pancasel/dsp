@@ -71,6 +71,7 @@ class PolypharmacySystem:
             settings.gene_names_file,
             settings.side_effects_vi_file,
             settings.serious_keywords_file,
+            settings.serious_effects_file,
         )
         return cls(settings, graph, names, DrugResolver(names, graph.drug_ids))
 
@@ -128,7 +129,7 @@ class PolypharmacySystem:
         drugs, sources = self.resolve_regimen(inputs)
         limits = (self.settings.max_serious_effects, self.settings.max_other_effects)
         graph_context, evidence = self.graph.retrieve(
-            drugs, self.names.is_serious, self.settings.ranking
+            drugs, self.names.is_serious, self.settings.ranking, self.names.is_critical
         )
         llm_context = build_llm_context(drugs, graph_context, evidence, self.names, *limits)
 

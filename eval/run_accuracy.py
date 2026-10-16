@@ -27,6 +27,7 @@ import itertools
 import math
 import os
 import random
+import re
 import sqlite3
 import statistics
 import time
@@ -581,6 +582,189 @@ def a4_validator(settings: Settings, graph, names, seed: int, count: int) -> Non
     write_csv("a4_validator.csv", rows)
 
 
+# --------------------------------------------------------------------- E2
+def e2_extraction(resolver) -> None:
+    """Drugs found in whole chat messages (the path the chat UI actually uses)."""
+    print("E2 drug extraction from chat messages")
+    with (RESULTS.parent / "extract_cases.csv").open(encoding="utf-8", newline="") as stream:
+        cases = list(csv.DictReader(stream))
+    rows = []
+    tp = fp = fn = asked = 0
+    for case in cases:
+        expected = {resolver.resolve(name).stitch_id for name in case["expected"].split("|") if name}
+        found = resolver.extract(case["message"])
+        got = {item.stitch_id for item in found if item.stitch_id}
+        questions = [item.query for item in found if item.stitch_id is None and item.method == "ambiguous"]
+        tp += len(got & expected)
+        fp += len(got - expected)
+        fn += len(expected - got)
+        asked += len(questions)
+        rows.append({
+            "message": case["message"],
+            "category": case["category"],
+            "expected": "|".join(sorted(resolver.names.drug_name(d) for d in expected)),
+            "got": "|".join(sorted(resolver.names.drug_name(d) for d in got)),
+            "asked": "|".join(questions),
+            "exact": int(got == expected),
+        })
+        if got != expected:
+            print(f"  MISMATCH: {case['message']!r}: expected {rows[-1]['expected']} got {rows[-1]['got']} asked {questions}")
+    write_csv("e2_extraction.csv", rows)
+    summary = {
+        "messages": len(rows),
+        "exact_match": round(sum(r["exact"] for r in rows) / len(rows), 4),
+        "drug_precision": round(tp / (tp + fp), 4) if tp + fp else 0.0,
+        "drug_recall": round(tp / (tp + fn), 4) if tp + fn else 0.0,
+        "wrong_drugs": fp,
+        "missed_drugs": fn,
+        "clarifying_questions": asked,
+    }
+    write_csv("e2_summary.csv", [summary])
+    print(f"  {summary}")
+
+
+# --------------------------------------------------------------------- A5
+# Decagon names that count as the expected outcome of each benchmark case.
+EXPECTED_EFFECTS = {
+    "bleeding": r"haemorrhag|hemorrhag|bleed|haematemesis|melaena|haematochezia|coughing blood|haemarthrosis|hematoma|haematoma",
+    "kidney": r"kidney failure|renal failure|azotaemia",
+    "hyperkalaemia": r"excess potassium|hyperkal",
+    "bradycardia": r"bradycardia|bradyarrhythmia|heart block|atrioventricular block|sinus arrest",
+    "arrhythmia": r"arrhythmia|tachycardia ventricular|ventricular fibrillation|torsade|\bafib\b|\bfib\b|extrasystoles|bradycardia",
+    "rhabdomyolysis": r"rhabdomyolysis|myoglobinuria|muscle inflammation|myopathy",
+    "hypoglycaemia": r"hypoglyc",
+    "myelosuppression": r"neutropenia|agranulocyt|pancytopenia|bone marrow|thrombocytopenia|leucopenia|aplas",
+    "cns_respiratory_depression": r"respiratory failure|hypoventilation|\bcoma\b|apnea|apnoea|loss of consciousness|pulmonary arrest|respiratory depression",
+    "seizure_serotonin": r"convulsion|seizure|epilep|serotonin",
+    "hypotension": r"hypotension|fainting|syncope|arterial pressure nos decreased",
+}
+EXPECTED_VI = {
+    "bleeding": "chảy máu", "kidney": "suy thận", "hyperkalaemia": "tăng kali máu",
+    "bradycardia": "nhịp chậm / block tim", "arrhythmia": "loạn nhịp", "rhabdomyolysis": "tiêu cơ vân",
+    "hypoglycaemia": "hạ đường huyết", "myelosuppression": "ức chế tủy",
+    "cns_respiratory_depression": "ức chế thần kinh / hô hấp", "seizure_serotonin": "co giật / serotonin",
+    "hypotension": "tụt huyết áp",
+}
+
+
+def a5_clinical_benchmark(settings: Settings, graph, names, resolver) -> None:
+    """Do well-established interactions reach the top of the serious list?"""
+    import dataclasses
+
+    from graphrag.names import NameIndex
+    from graphrag.presenter import select_effects
+
+    print("A5 clinical benchmark of established drug interactions")
+    with (RESULTS.parent / "clinical_benchmark.csv").open(encoding="utf-8", newline="") as stream:
+        cases = list(csv.DictReader(stream))
+    excluded = [r["keyword"] for r in read_csv("../../resources/serious_keywords.csv") if r["category"] == "exclude"]
+    keyword_only = NameIndex(names.drugs, names.genes, names.side_effects_vi, names.serious_keywords, {}, excluded)
+    base = settings.ranking
+    variants = {
+        "Chỉ từ khóa": (keyword_only.is_serious, dataclasses.replace(base, critical=0.0)),
+        "IME": (names.is_serious, dataclasses.replace(base, critical=0.0)),
+        "IME + đe dọa tính mạng (mặc định)": (names.is_serious, base),
+        "IME + đe dọa tính mạng, bỏ IDF": (names.is_serious, dataclasses.replace(base, idf=0.0)),
+    }
+    rows, summary = [], []
+    per_variant = collections.defaultdict(list)
+    for case in cases:
+        drugs = [resolver.resolve(name).stitch_id for name in case["drugs"].split("|")]
+        pair = tuple(sorted(resolver.resolve(name).stitch_id for name in case["interacting_pair"].split("|")))
+        if None in drugs or None in pair:
+            print(f"  case {case['case']}: drug not in Decagon, skipped")
+            continue
+        pattern = re.compile(EXPECTED_EFFECTS[case["expected"]], re.IGNORECASE)
+        row = {"case": case["case"], "drugs": case["drugs"], "expected": case["expected"]}
+        documented = graph.side_effects(*pair)
+        row["pair_documented"] = int(any(pattern.search(e.name) for e in documented))
+        for label, (is_serious, weights) in variants.items():
+            context, _ = graph.retrieve(drugs, is_serious, weights, names.is_critical)
+            ranked = context["ranked_effects"]
+            serious = [item for item in ranked if item["serious"]]
+            rank = next((i for i, item in enumerate(serious, 1) if pattern.search(item["name"])), None)
+            shown = select_effects(ranked, settings.max_serious_effects, settings.max_other_effects)
+            hit = any(pattern.search(item["name"]) for item in shown[: settings.max_serious_effects] if item["serious"])
+            row[f"{label}|rank"] = rank or ""
+            per_variant[label].append((rank, hit, any(pattern.search(i["name"]) for i in ranked)))
+        rows.append(row)
+    write_csv("a5_clinical_benchmark.csv", rows)
+    for label, results in per_variant.items():
+        documented = [r for r in results if r[2]]
+        line = {
+            "variant": label,
+            "cases": len(results),
+            "documented": len(documented),
+            "hit@3": round(sum(1 for r in documented if r[0] and r[0] <= 3) / len(documented), 4),
+            "hit@10": round(sum(1 for r in documented if r[0] and r[0] <= 10) / len(documented), 4),
+            "mrr": round(statistics.mean(1 / r[0] if r[0] else 0 for r in documented), 4),
+        }
+        summary.append(line)
+        print(f"  {label}: documented {line['documented']}/{line['cases']} hit@3={line['hit@3']} "
+              f"hit@10={line['hit@10']} MRR={line['mrr']}")
+    write_csv("a5_summary.csv", summary)
+    colors = dict(zip(variants, [COLORS["random"], COLORS["popularity"], COLORS["graph"], COLORS["extra"]]))
+    grouped_bars(f"A5. Benchmark tương tác kinh điển ({summary[0]['documented']} ca có dữ liệu)",
+                 ["hit@3", "hit@10", "mrr"],
+                 {line["variant"]: {k: line[k] for k in ("hit@3", "hit@10", "mrr")} for line in summary},
+                 colors, "a5_clinical_benchmark.png")
+
+
+# --------------------------------------------------------------------- A6
+# serious_keywords.csv before the IME labels were introduced (commit a1f2615).
+LEGACY_KEYWORDS = (
+    "haemorrhage hemorrhage bleeding haematemesis melaena arrhythmia fibrillation|tachycardia ventricular|"
+    "torsade|qt prolonged|cardiac arrest|cardiac failure|heart failure|myocardial infarction|bradycardia|"
+    "heart block|hypotension|renal failure|kidney failure|acute kidney|nephropathy|hepatic failure|"
+    "liver failure|hepatitis|hepatotoxicity|jaundice|rhabdomyolysis|serotonin syndrome|neuroleptic malignant|"
+    "convulsion|seizure|coma|stroke|cerebrovascular accident|respiratory depression|respiratory arrest|"
+    "respiratory failure|apnoea|pulmonary embolism|thrombosis|anaphylactic|anaphylaxis|angioedema|"
+    "stevens-johnson|toxic epidermal necrolysis|agranulocytosis|pancytopenia|neutropenia|thrombocytopenia|"
+    "aplastic anaemia|hypoglycaemia|hyperkalaemia|hyponatraemia|lactic acidosis|pancreatitis|"
+    "gastrointestinal perforation|sepsis|death"
+)
+
+
+def a6_serious_classifier() -> None:
+    """Keyword matching vs the EMA IME reference, on names with an exact IME match."""
+    from graphrag.names import _word_pattern
+
+    print("A6 serious-effect classifier vs EMA IME")
+    labels = [row for row in read_csv("../../resources/serious_effects.csv") if row["method"] in {"ime_match", "excluded"}]
+    if not labels:
+        print("  resources/serious_effects.csv missing; run scripts/build_serious_effects.py")
+        return
+    legacy_words = [w for part in LEGACY_KEYWORDS.split("|") for w in ([part] if " " in part else part.split())]
+    keyword_rows = read_csv("../../resources/serious_keywords.csv")
+    current = [r["keyword"] for r in keyword_rows if r["category"] != "exclude"]
+    excluded = [r["keyword"] for r in keyword_rows if r["category"] == "exclude"]
+    methods = {
+        "Từ khóa cũ (khớp nguyên từ)": (_word_pattern(legacy_words), None),
+        "Từ khóa mới (số nhiều + loại trừ)": (_word_pattern(current, plural=True), _word_pattern(excluded)),
+    }
+    rows = []
+    for label, (pattern, exclude) in methods.items():
+        tp = fp = fn = tn = 0
+        for row in labels:
+            text = row["name_en"].casefold()
+            predicted = bool(pattern.search(text)) and not (exclude and exclude.search(text))
+            truth = row["serious"] == "1"
+            tp += predicted and truth
+            fp += predicted and not truth
+            fn += truth and not predicted
+            tn += not predicted and not truth
+        precision = tp / (tp + fp) if tp + fp else 0.0
+        recall = tp / (tp + fn) if tp + fn else 0.0
+        rows.append({
+            "method": label, "names": len(labels), "ime_serious": tp + fn,
+            "precision": round(precision, 4), "recall": round(recall, 4),
+            "f1": round(2 * precision * recall / (precision + recall), 4) if precision + recall else 0.0,
+            "tp": tp, "fp": fp, "fn": fn, "tn": tn,
+        })
+        print(f"  {label}: precision={rows[-1]['precision']} recall={rows[-1]['recall']} f1={rows[-1]['f1']}")
+    write_csv("a6_serious_classifier.csv", rows)
+
+
 # ----------------------------------------------------------------- summary
 def figures_from_offline() -> None:
     """Figures for E1 and E4 (computed by run_offline.py) if their CSVs exist."""
@@ -660,6 +844,25 @@ def write_report(meta: dict) -> None:
                   "",
                   "![E1](figures/e1_resolver.png)",
                   ""]
+    e2 = read_csv("e2_summary.csv")
+    if e2:
+        row = e2[0]
+        misses = [r for r in read_csv("e2_extraction.csv") if r["exact"] != "1"]
+        parts += ["## E2. Trích thuốc từ câu chat",
+                  "",
+                  f"{row['messages']} câu chat thực tế (biệt dược, hàm lượng, sai chính tả, tiếng Anh, có từ thừa như "
+                  "\"vitamin C\", \"rượu bia\", triệu chứng). Đây là đường đi thật của giao diện chat.",
+                  "",
+                  _table([{**row, "exact_match": _pct(row["exact_match"]), "drug_precision": _pct(row["drug_precision"]),
+                           "drug_recall": _pct(row["drug_recall"])}],
+                         [("exact_match", "Đúng cả câu"), ("drug_precision", "Precision thuốc"),
+                          ("drug_recall", "Recall thuốc"), ("wrong_drugs", "Thuốc nhận nhầm"),
+                          ("missed_drugs", "Thuốc bỏ sót"), ("clarifying_questions", "Câu hỏi lại")]),
+                  ""]
+        if misses:
+            parts += ["Các câu chưa đúng:", ""] + [
+                f"- \"{r['message']}\": mong đợi {r['expected'] or '(không có)'}, nhận {r['got'] or '(không có)'}"
+                for r in misses] + [""]
     a1 = read_csv("a1_faithfulness.csv")
     if a1:
         for row in a1:
@@ -751,6 +954,53 @@ def write_report(meta: dict) -> None:
                   _table(a4, [("case", "Trường hợp"), ("predictions", "Số dự đoán"), ("expected", "Mong đợi"),
                               ("kept", "Giữ"), ("rejected", "Loại"), ("pct", "Đúng")]),
                   ""]
+    a5 = read_csv("a5_summary.csv")
+    if a5:
+        detail = read_csv("a5_clinical_benchmark.csv")
+        default = next((key for key in detail[0] if key.endswith("(mặc định)|rank")), None) if detail else None
+        for row in a5:
+            for key in ("hit@3", "hit@10"):
+                row[key] = _pct(row[key])
+        parts += ["## A5. Benchmark tương tác thuốc kinh điển",
+                  "",
+                  f"{len(detail)} ca tương tác đã được xác lập lâm sàng (`eval/clinical_benchmark.csv`), mỗi ca gồm cặp "
+                  "tương tác và một thuốc thứ ba. Đo vị trí tác dụng phụ mong đợi trong danh sách nghiêm trọng "
+                  "(hệ thống hiển thị 10 mục đầu).",
+                  "",
+                  _table(a5, [("variant", "Cách xếp hạng"), ("documented", "Ca có dữ liệu"), ("hit@3", "Hit@3"),
+                              ("hit@10", "Hit@10"), ("mrr", "MRR")]),
+                  "",
+                  "![A5](figures/a5_clinical_benchmark.png)",
+                  ""]
+        if default:
+            parts += ["| Ca | Phác đồ | Mong đợi | Hạng (mặc định) |", "|---|---|---|---|"] + [
+                f"| {r['case']} | {r['drugs'].replace('|', ' + ')} | {EXPECTED_VI.get(r['expected'], r['expected'])} | "
+                f"{r[default] or 'không nằm trong nhóm nghiêm trọng'} |" for r in detail] + [""]
+        parts += ["**Diễn giải.** Decagon chỉ cho biết một tác dụng phụ *có* được báo cáo cho cặp thuốc hay không, "
+                  "không có tần suất hay mức độ, nên điểm xếp hạng không phân biệt được tác dụng phụ đặc trưng của "
+                  "tương tác với hàng trăm tác dụng phụ khác của cùng cặp. Khoảng một nửa số ca kinh điển lên được "
+                  "top 10. Thử thêm chuẩn hoá theo độ đặc trưng của thuốc (kiểu PRR) cũng không cải thiện ổn định, "
+                  "nên trọng số không được chỉnh theo bộ 26 ca này để tránh overfit. Hướng cải thiện: dùng số lượng "
+                  "báo cáo FAERS để tính disproportionality thật.", ""]
+    a6 = read_csv("a6_serious_classifier.csv")
+    if a6:
+        labels = read_csv("../../resources/serious_effects.csv")
+        combo = [r for r in labels if r["vocabulary"] == "combo"]
+        parts += ["## A6. Phân loại tác dụng phụ nghiêm trọng",
+                  "",
+                  "Chuẩn tham chiếu: danh sách *Important Medical Event* (IME) của EMA, MedDRA 29.1 "
+                  f"(`scripts/build_serious_effects.py`). {sum(r['serious'] == '1' for r in combo)} / 1317 tác dụng phụ phối hợp "
+                  "được gắn nghiêm trọng; ung thư, dị tật bẩm sinh, thai sản, nhiễm trùng cộng đồng và bệnh mạn tính "
+                  "bị loại vì trong FAERS chúng thường là chỉ định hay bệnh nền. Bảng dưới so cách dùng từ khóa với "
+                  "IME trên các tên khớp trực tiếp một thuật ngữ IME.",
+                  "",
+                  _table(a6, [("method", "Phương pháp"), ("names", "Số tên"), ("ime_serious", "IME nghiêm trọng"),
+                              ("precision", "Precision"), ("recall", "Recall"), ("f1", "F1")]),
+                  "",
+                  "**Diễn giải.** Từ khóa chính xác (precision cao) nhưng chỉ bắt được một phần nhỏ (recall thấp) các "
+                  "tác dụng phụ IME, và bỏ sót tên thông dụng như \"heart attack\", \"gastrointestinal bleed\", "
+                  "\"deep vein thromboses\". Vì vậy hệ thống dùng nhãn IME làm chính; từ khóa chỉ dùng cho tên "
+                  "chưa ánh xạ được và để ưu tiên nhóm đe dọa tính mạng khi xếp hạng.", ""]
     e3 = read_csv("e3_llm_groundedness.csv")
     if e3:
         raw = sum(int(row["raw_predictions"]) for row in e3)
@@ -770,12 +1020,14 @@ def main() -> None:
     parser.add_argument("--regimens", type=int, default=200)
     parser.add_argument("--min-pairs", type=int, default=500)
     parser.add_argument("--test-fraction", type=float, default=0.1)
-    parser.add_argument("--only", nargs="*", choices=["a1", "a2", "a3", "a4"])
+    parser.add_argument("--only", nargs="*", choices=["e2", "a1", "a2", "a3", "a4", "a5", "a6"])
     args = parser.parse_args()
-    selected = set(args.only or ["a1", "a2", "a3", "a4"])
-    settings, graph, names, _ = load()
+    selected = set(args.only or ["e2", "a1", "a2", "a3", "a4", "a5", "a6"])
+    settings, graph, names, resolver = load()
     meta = {"seed": args.seed, "min_pairs": args.min_pairs, "test_fraction": args.test_fraction,
             "a1_regimens": args.regimens}
+    if "e2" in selected:
+        e2_extraction(resolver)
     if "a1" in selected:
         a1_faithfulness(settings, graph, names, args.seed, args.regimens)
     if "a2" in selected:
@@ -784,6 +1036,10 @@ def main() -> None:
         a3_side_effect_prediction(graph, args.seed, args.min_pairs, args.test_fraction)
     if "a4" in selected:
         a4_validator(settings, graph, names, args.seed, max(args.regimens // 4, 20))
+    if "a5" in selected:
+        a5_clinical_benchmark(settings, graph, names, resolver)
+    if "a6" in selected:
+        a6_serious_classifier()
     figures_from_offline()
     write_report(meta)
 

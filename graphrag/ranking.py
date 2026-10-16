@@ -6,7 +6,8 @@ the raw list is unusable. Each effect gets a transparent additive score:
     score = w_recurrence * recurrence    # pairs in the regimen that record it
           + w_idf        * idf           # log(total pairs / pairs with effect)
           + w_not_in_mono * not_in_mono  # absent from both drugs' mono lists
-          + w_serious    * serious       # matches resources/serious_keywords.csv
+          + w_serious    * serious       # EMA Important Medical Event (names.is_serious)
+          + w_critical   * critical      # life-threatening class (serious_keywords.csv)
           + w_amplified  * amplified     # pair shares a target with a third drug
 
 The weights live in Settings.ranking so they can be ablated (eval E5).
@@ -30,6 +31,7 @@ class RankedEffect:
     idf: float = 0.0
     not_in_mono: bool = False
     serious: bool = False
+    critical: bool = False
     amplified: bool = False
     score: float = 0.0
 
@@ -48,6 +50,7 @@ class RankedEffect:
             "idf": round(self.idf, 3),
             "not_in_mono": self.not_in_mono,
             "serious": self.serious,
+            "critical": self.critical,
             "amplified": self.amplified,
             "score": round(self.score, 3),
         }
@@ -61,6 +64,7 @@ def rank_effects(
     mono_codes: Callable[[str], set[str]],
     is_serious: Callable[[str], bool] | None = None,
     weights: RankingWeights | None = None,
+    is_critical: Callable[[str], bool] | None = None,
 ) -> list[RankedEffect]:
     """Aggregate pairwise effects over the regimen and sort by score.
 
@@ -80,6 +84,7 @@ def rank_effects(
                     name=effect.name,
                     idf=math.log(total_pairs / count),
                     serious=bool(is_serious and is_serious(effect.name)),
+                    critical=bool(is_critical and is_critical(effect.name)),
                 )
                 by_code[effect.code] = item
             item.pairs.append(pair)
@@ -95,6 +100,7 @@ def rank_effects(
             + weights.idf * item.idf
             + weights.not_in_mono * item.not_in_mono
             + weights.serious * item.serious
+            + weights.critical * (item.serious and item.critical)
             + weights.amplified * item.amplified
         )
     return sorted(by_code.values(), key=lambda item: (-item.score, item.name.casefold()))

@@ -1,0 +1,31 @@
+message,expected,category
+tôi đang uống panadol với ibuprofen và warfarin,paracetamol|ibuprofen|warfarin,brand_mix
+"bố tôi dùng Concor 5mg, Lipitor 20mg và Plavix 75mg mỗi ngày",bisoprolol|atorvastatin|clopidogrel,brand_strength
+"mẹ mình uống glucophage 850, amlor 5 và losartan",metformin|amlodipine|losartan,brand_strength
+"Em bị đau dạ dày đang uống omeprazol 20mg, thêm Voltaren",omeprazole|diclofenac,brand_strength
+aspirin 81mg + clopidogrel + atorvastatin,aspirin|clopidogrel|atorvastatin,generic
+"đang dùng Lasix, Aldactone và Lanoxin",furosemide|spironolactone|digoxin,brand
+tôi uống thuốc huyết áp coversyl và thuốc tiểu đường amaryl,perindopril|glimepiride,sentence
+uống xanax với tramadol có sao không,alprazolam|tramadol,sentence
+"I'm taking warfarin, aspirin and omeprazole",warfarin|aspirin|omeprazole,english
+"con tôi bị sốt uống hapacol 250, thêm augmentin",paracetamol|amoxicillin,brand_strength
+Prozac và Zoloft cùng lúc có được không,fluoxetine|sertraline,sentence
+"simvastatin, clarithromycin, amiodarone",simvastatin|clarithromycin|amiodarone,generic
+"tôi đang điều trị với metformin 500mg x 2 lần/ngày, Diovan 80 và Crestor 10",metformin|valsartan|rosuvastatin,brand_strength
+dùng ibuprofn với paracetamol và wafarin,ibuprofen|paracetamol|warfarin,typo
+"seduxen, haldol, tegretol",diazepam|haloperidol|carbamazepine,brand
+"tôi uống vitamin C, panadol và nurofen",paracetamol|ibuprofen,not_in_data
+"Ông tôi dùng Cordarone, Coumadin và Lanoxin",amiodarone|warfarin|digoxin,brand
+đang uống thuốc ciprobay 500 kèm daonil,ciprofloxacin|glibenclamide,brand_strength
+Viagra với Nitromint,sildenafil|nitroglycerin,brand
+"methotrexate, trimethoprim and prednisone",methotrexate|trimethoprim|prednisone,english
+tôi uống Klacid và Zocor,clarithromycin|simvastatin,brand
+"đang dùng Medrol 16mg, Celebrex 200mg, và Losec",methylprednisolone|celecoxib|omeprazole,brand_strength
+Uống Efferalgan 500 với Tylenol được không,paracetamol,same_drug
+thuốc của tôi: Betaloc ZOK 50mg; Adalat retard; Natrilix SR,metoprolol|nifedipine|indapamide,brand_strength
+tôi uống rượu bia hằng ngày và dùng paracetamol,paracetamol,not_in_data
+Zyrtec với Ventolin,cetirizine|salbutamol,brand
+"đang uống Depakine và Keppra, mới thêm Rivotril",valproate|levetiracetam|clonazepam,brand
+"kiểm tra giúp tôi: amlodipine, atorvastatin, aspirin, metformin, losartan",amlodipine|atorvastatin|aspirin|metformin|losartan,generic
+"tôi bị cảm, uống thuốc cảm thôi",,no_drug
+fluconazole với glipizide,fluconazole|glipizide,generic

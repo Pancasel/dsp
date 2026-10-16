@@ -65,7 +65,7 @@ WARFARIN,case,Warfarin,Warfarin,exact,100.0,correct
 esomeprazole,not_in_data,,,ambiguous,90.9,correct
 levothyroxine,not_in_data,,,ambiguous,92.3,correct
 Nexium,not_in_data,,,not_found,62.7,correct
-Vitamin C,not_in_data,,,ambiguous,91.2,correct
+Vitamin C,not_in_data,,,ambiguous,84.2,correct
 Thuốc ho Bảo Thanh,not_in_data,,,not_found,61.5,correct
 abc,not_in_data,,,not_found,63.3,correct
 insulin,not_in_data,,,ambiguous,85.7,correct

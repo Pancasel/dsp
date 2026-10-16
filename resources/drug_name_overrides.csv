@@ -32,3 +32,23 @@ CID000163742,Fondaparinux,Title is the fondaparinux pentasaccharide sequence
 CID005311082,Eptifibatide,Title deamino-Cys-hArg-Gly-Asp-Trp-Pro-Cys
 CID006447131,Pimecrolimus,Molecular formula C43H68ClNO11
 CID009571074,Cefditoren,Cephalosporin with (Z)-2-(4-methylthiazol-5-yl)ethenyl side chain
+CID000003161,Doxycycline,Deprecated CID; PubChem preferred compound 54681536 (doxycycline epimer)
+CID000004052,Meloxicam,Deprecated CID; PubChem preferred compound 54677470 meloxicam
+CID000004200,Minocycline,Deprecated CID; PubChem preferred compound 54687237 minocycline
+CID000004645,Oxytetracycline,Deprecated CID; PubChem preferred compound 54686003 oxytetracycline
+CID000004856,Piroxicam,Deprecated CID; PubChem preferred compound 54676228 piroxicam
+CID000005412,Tetracycline,Deprecated CID; PubChem preferred compound 54685734 tetracycline
+CID000008953,Sodium bicarbonate,Deprecated CID; PubChem preferred compound 516892 sodium bicarbonate
+CID000009052,Acenocoumarol,Deprecated CID; PubChem preferred compound 54676537 acenocoumarol; mono lists prothrombin and haemorrhage terms
+CID000065027,Tipranavir,Deprecated CID; PubChem preferred compound 54682461 tipranavir
+CID000083786,Allopurinol,Deprecated CID; preferred compound 135460353 is a pyrazolopyrimidinone (allopurinol isomer); targets HPRT1/PRTFDC1 as allopurinol
+CID000443871,Nateglinide,Formula C19H27NO3 = nateglinide (N-acyl D-phenylalanine)
+CID000504578,Neomycin,Aminoglycoside C24H47N5O12 (neamine-ribose-aminosugar); mono lists ammonia increased (hepatic encephalopathy use)
+CID000508230,Mycophenolic acid,Synonym C2-MPAcid (mycophenolic acid core); mono lists kidney transplant complications
+CID003086258,Porfimer,Formula C34H38N4O5 hematoporphyrin monomer of porfimer; mono lists bronchopleural fistula and stent occlusion
+CID003468412,Nystatin,Polyene hexaene macrolide with mycosamine (nystatin; amphotericin is a heptaene)
+CID005282044,Tigecycline,Deprecated CID; PubChem preferred compound 54686904 tigecycline
+CID005311297,Montelukast,Chloroquinolinyl-ethenyl-phenyl sulfanylpropyl core of montelukast; target CYSLTR1
+CID006398525,Sucralfate,Formula C11H60Al9O55S8 = aluminium sucrose octasulfate
+CID000002349,Benzylpenicillin,PubChem title Penicillins; formula C16H18N2O4S = benzylpenicillin (penicillin G)
+CID000004730,Phenoxymethylpenicillin,Formula C16H17N2O5S- with phenoxyacetyl side chain = penicillin V

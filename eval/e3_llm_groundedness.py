@@ -30,7 +30,7 @@ def run(args: argparse.Namespace) -> None:
     print(f"model={settings.llm_model}, {len(regimens)} calls")
     rows = []
     for index, regimen in enumerate(regimens, start=1):
-        context, evidence = graph.retrieve(regimen, names.is_serious, settings.ranking)
+        context, evidence = graph.retrieve(regimen, names.is_serious, settings.ranking, names.is_critical)
         llm_context = build_llm_context(
             regimen, context, evidence, names,
             settings.max_serious_effects, settings.max_other_effects,

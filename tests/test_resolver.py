@@ -92,3 +92,43 @@ def test_extract_keeps_ambiguous_names_for_confirmation(resolver: DrugResolver) 
     results = resolver.extract("uống esomeprazole với ibuprofen")
     assert results[0].stitch_id is None and results[0].method in {"ambiguous", "not_found"}
     assert results[1].stitch_id == "CID000003672"
+
+
+@pytest.fixture
+def salt_resolver() -> DrugResolver:
+    drugs = {
+        "CID000005234": DrugName("CID000005234", "Sodium Chloride", ["Sodium monochloride"], []),
+        "CID000004873": DrugName("CID000004873", "Potassium Chloride", ["Potassium monochloride"], []),
+        "CID000002349": DrugName("CID000002349", "Benzylpenicillin", ["penicillin", "Penicillin G"], []),
+        "CID000004730": DrugName("CID000004730", "Phenoxymethylpenicillin", ["penicillin", "Penicillin V"], []),
+        "CID000003446": DrugName("CID000003446", "Mesna", ["CoM"], []),
+        "CID000003249": DrugName("CID000003249", "Ergocalciferol", ["vitamin", "Vitamin D2"], []),
+        "CID000001983": DrugName("CID000001983", "Acetaminophen", [], ["Panadol"]),
+        "CID000002833": DrugName("CID000002833", "Colchicine", [], []),
+    }
+    return DrugResolver(NameIndex(drugs, {}, {}, []), set(drugs))
+
+
+def test_salts_that_are_the_drug_keep_their_cation(salt_resolver: DrugResolver) -> None:
+    assert normalize("Sodium Chloride") == "sodium chloride"
+    assert normalize("Natri clorid 0.9%") == "natri clorid"
+    assert salt_resolver.resolve("sodium chloride").stitch_id == "CID000005234"
+    assert salt_resolver.resolve("Potassium Chloride").stitch_id == "CID000004873"
+    found = [item.stitch_id for item in salt_resolver.extract("tôi uống potassium chloride với panadol")]
+    assert found == ["CID000004873", "CID000001983"]
+
+
+def test_shared_synonym_asks_instead_of_guessing(salt_resolver: DrugResolver) -> None:
+    result = salt_resolver.resolve("penicillin")
+    assert result.method == "ambiguous" and result.stitch_id is None
+    assert {item.stitch_id for item in result.candidates} == {"CID000002349", "CID000004730"}
+    assert salt_resolver.resolve("penicillin V").stitch_id == "CID000004730"
+
+
+def test_chat_words_and_generic_synonyms_are_not_drugs(salt_resolver: DrugResolver) -> None:
+    found = [item.stitch_id for item in salt_resolver.extract("tôi ăn cơm xong uống panadol")]
+    assert found == ["CID000001983"]
+    found = [item.stitch_id for item in salt_resolver.extract("uống vitamin tổng hợp với panadol")]
+    assert "CID000003249" not in found
+    found = [item.stitch_id for item in salt_resolver.extract("ông tôi bị gút uống colchicine")]
+    assert found == ["CID000002833"]

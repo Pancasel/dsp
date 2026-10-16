@@ -10,7 +10,7 @@ from dataclasses import asdict, dataclass, field
 
 from rapidfuzz import fuzz, process
 
-from graphrag.names import NameIndex, normalize
+from graphrag.names import NameIndex, normalize, tokenize
 
 
 ACCEPT_SCORE = 90.0
@@ -42,7 +42,20 @@ CHAT_STOPWORDS = {
     "please", "check", "also", "is", "it", "safe", "my", "can", "combination",
     "drug", "drugs", "medicine", "medicines", "pill", "pills", "and", "or",
     "what", "about", "side", "effects", "effect",
+    # meals, time and symptoms/diseases mentioned around the drug names
+    "com", "xong", "sau", "truoc", "bua", "sang", "trua", "dem", "ngu",
+    "dau", "sot", "ho", "cam", "cum", "gut", "cao", "huyet", "ap", "tieu",
+    "duong", "phe", "bung", "benh", "tim", "mach", "viem", "ruou", "bia",
+    "lung", "khop", "day", "hong", "mui", "rang", "met",
 }
+# PubChem synonyms that are ordinary words or abbreviations, never a drug on
+# their own ("vitamin" -> Ergocalciferol, "CoM" -> Mesna, "delta" -> Dronabinol).
+GENERIC_SYNONYMS = {
+    "vitamin", "delta", "com", "stim", "hex", "cas", "mer", "dup", "aldo", "oxis",
+}
+# A single word inside a sentence counts as a drug only if it is a primary
+# name, a curated brand, or a synonym at least this long without digits.
+SCAN_MIN_SYNONYM_LENGTH = 5
 
 
 @dataclass
@@ -78,20 +91,41 @@ class DrugResolver:
         self.drug_ids = drug_ids
         # normalized key -> (stitch_id, original text, method)
         self._exact: dict[str, tuple[str, str, str]] = {}
+        # Keys shared by several drugs ("penicillin", "bisphosphonate"): the
+        # user must choose, the first drug in ID order must not silently win.
+        self._ambiguous: dict[str, list[str]] = {}
+        # Priority: curated brand > primary name > PubChem synonym.
+        sources: dict[str, dict[str, tuple[int, str]]] = {}
         for stitch_id in sorted(drug_ids):
             drug = names.drugs.get(stitch_id)
             if drug is None:
                 continue
-            for text in [drug.name, *drug.synonyms]:
+            entries = [(2, alias) for alias in drug.aliases_vi]
+            entries += [(1, drug.name)] + [(0, text) for text in drug.synonyms]
+            for rank, text in entries:
                 key = normalize(text)
-                if len(key) >= MIN_KEY_LENGTH:
-                    self._exact.setdefault(key, (stitch_id, text, "exact"))
-            for alias in drug.aliases_vi:
-                key = normalize(alias)
-                if len(key) >= MIN_KEY_LENGTH:
-                    # Curated brands win over PubChem synonyms with the same text.
-                    self._exact[key] = (stitch_id, alias, "brand_alias")
+                if len(key) < MIN_KEY_LENGTH or (rank == 0 and key in GENERIC_SYNONYMS):
+                    continue
+                current = sources.setdefault(key, {}).get(stitch_id)
+                if current is None or rank > current[0]:
+                    sources[key][stitch_id] = (rank, text)
+        for key, owners in sources.items():
+            best = max(rank for rank, _ in owners.values())
+            top = sorted(stitch_id for stitch_id, (rank, _) in owners.items() if rank == best)
+            if len(top) > 1:
+                self._ambiguous[key] = top
+                continue
+            rank, text = owners[top[0]]
+            self._exact[key] = (top[0], text, "brand_alias" if rank == 2 else "exact")
         self._keys = list(self._exact)
+        self._scan_safe = {
+            key
+            for key, (stitch_id, text, method) in self._exact.items()
+            if " " in key
+            or method == "brand_alias"
+            or text == names.drugs[stitch_id].name
+            or (len(key) >= SCAN_MIN_SYNONYM_LENGTH and not any(c.isdigit() for c in key))
+        }
 
     def resolve(self, query: str) -> ResolveResult:
         raw = query.strip()
@@ -106,6 +140,13 @@ class DrugResolver:
         if hit:
             stitch_id, _, method = hit
             return ResolveResult(raw, stitch_id, self.names.drug_name(stitch_id), method, 100.0)
+        shared = self._ambiguous.get(key)
+        if shared:
+            candidates = [
+                Candidate(stitch_id, self.names.drug_name(stitch_id), raw, 100.0, 100.0)
+                for stitch_id in shared
+            ]
+            return ResolveResult(raw, None, None, "ambiguous", 100.0, candidates)
 
         candidates = self._fuzzy(key)
         if not candidates or candidates[0].score < SUGGEST_SCORE:
@@ -141,14 +182,25 @@ class DrugResolver:
             if whole.method in {"exact", "brand_alias", "stitch_id"}:
                 found.append(whole)
                 continue
-            words = normalize(segment).split()
-            matches = self._scan_known_names(words)
+            # Scan the words before salt/form removal so that "potassium
+            # chloride" is still seen as one name inside a sentence.
+            matches = self._scan_known_names(tokenize(segment))
             if matches:
                 found.extend(matches)
                 continue
+            words = normalize(segment).split()
             remaining = [word for word in words if word not in CHAT_STOPWORDS]
-            if remaining:
-                found.append(self.resolve(" ".join(remaining)))
+            if not remaining:
+                continue
+            phrase = self.resolve(" ".join(remaining))
+            if phrase.method == "not_found" and len(remaining) > 1:
+                # "gut colchicine": a leftover symptom word must not hide the drug.
+                singles = [self.resolve(word) for word in remaining]
+                singles = [item for item in singles if item.method != "not_found"]
+                if singles:
+                    found.extend(singles)
+                    continue
+            found.append(phrase)
         unique: list[ResolveResult] = []
         seen: set[str] = set()
         for result in found:
@@ -164,9 +216,13 @@ class DrugResolver:
         index = 0
         while index < len(words):
             for size in range(min(longest, len(words) - index), 0, -1):
-                phrase = " ".join(words[index : index + size])
+                phrase = normalize(" ".join(words[index : index + size]))
                 hit = self._exact.get(phrase)
-                if hit and not (size == 1 and phrase in CHAT_STOPWORDS):
+                if (
+                    hit
+                    and phrase not in CHAT_STOPWORDS
+                    and (size > 1 or phrase in self._scan_safe)
+                ):
                     stitch_id, original, method = hit
                     results.append(
                         ResolveResult(original, stitch_id, self.names.drug_name(stitch_id), method, 100.0)

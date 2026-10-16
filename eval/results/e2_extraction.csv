@@ -1,0 +1,31 @@
+message,category,expected,got,asked,exact
+tôi đang uống panadol với ibuprofen và warfarin,brand_mix,Acetaminophen|Ibuprofen|Warfarin,Acetaminophen|Ibuprofen|Warfarin,,1
+"bố tôi dùng Concor 5mg, Lipitor 20mg và Plavix 75mg mỗi ngày",brand_strength,Atorvastatin|Bisoprolol|Clopidogrel,Atorvastatin|Bisoprolol|Clopidogrel,,1
+"mẹ mình uống glucophage 850, amlor 5 và losartan",brand_strength,Amlodipine|Losartan|Metformin,Amlodipine|Losartan|Metformin,,1
+"Em bị đau dạ dày đang uống omeprazol 20mg, thêm Voltaren",brand_strength,Diclofenac|Omeprazole,Diclofenac|Omeprazole,,1
+aspirin 81mg + clopidogrel + atorvastatin,generic,Aspirin|Atorvastatin|Clopidogrel,Aspirin|Atorvastatin|Clopidogrel,,1
+"đang dùng Lasix, Aldactone và Lanoxin",brand,Digoxin|Furosemide|Spironolactone,Digoxin|Furosemide|Spironolactone,,1
+tôi uống thuốc huyết áp coversyl và thuốc tiểu đường amaryl,sentence,Glimepiride|Perindopril,Glimepiride|Perindopril,,1
+uống xanax với tramadol có sao không,sentence,Alprazolam|Tramadol,Alprazolam|Tramadol,,1
+"I'm taking warfarin, aspirin and omeprazole",english,Aspirin|Omeprazole|Warfarin,Aspirin|Omeprazole|Warfarin,,1
+"con tôi bị sốt uống hapacol 250, thêm augmentin",brand_strength,Acetaminophen|Amoxicillin,Acetaminophen|Amoxicillin,,1
+Prozac và Zoloft cùng lúc có được không,sentence,Fluoxetine|Sertraline,Fluoxetine|Sertraline,,1
+"simvastatin, clarithromycin, amiodarone",generic,Amiodarone|Clarithromycin|Simvastatin,Amiodarone|Clarithromycin|Simvastatin,,1
+"tôi đang điều trị với metformin 500mg x 2 lần/ngày, Diovan 80 và Crestor 10",brand_strength,Metformin|Rosuvastatin|Valsartan,Metformin|Rosuvastatin|Valsartan,dieu tri,1
+dùng ibuprofn với paracetamol và wafarin,typo,Acetaminophen|Ibuprofen|Warfarin,Acetaminophen|Ibuprofen|Warfarin,,1
+"seduxen, haldol, tegretol",brand,Carbamazepine|Diazepam|Haloperidol,Carbamazepine|Diazepam|Haloperidol,,1
+"tôi uống vitamin C, panadol và nurofen",not_in_data,Acetaminophen|Ibuprofen,Acetaminophen|Ibuprofen,vitamin c,1
+"Ông tôi dùng Cordarone, Coumadin và Lanoxin",brand,Amiodarone|Digoxin|Warfarin,Amiodarone|Digoxin|Warfarin,,1
+đang uống thuốc ciprobay 500 kèm daonil,brand_strength,Ciprofloxacin|Glibenclamide,Ciprofloxacin|Glibenclamide,,1
+Viagra với Nitromint,brand,Nitroglycerin|Sildenafil,Nitroglycerin|Sildenafil,,1
+"methotrexate, trimethoprim and prednisone",english,Methotrexate|Prednisone|Trimethoprim,Methotrexate|Prednisone|Trimethoprim,,1
+tôi uống Klacid và Zocor,brand,Clarithromycin|Simvastatin,Clarithromycin|Simvastatin,,1
+"đang dùng Medrol 16mg, Celebrex 200mg, và Losec",brand_strength,Celecoxib|Methylprednisolone|Omeprazole,Celecoxib|Methylprednisolone|Omeprazole,,1
+Uống Efferalgan 500 với Tylenol được không,same_drug,Acetaminophen,Acetaminophen,,1
+thuốc của tôi: Betaloc ZOK 50mg; Adalat retard; Natrilix SR,brand_strength,Indapamide|Metoprolol|Nifedipine,Indapamide|Metoprolol|Nifedipine,,1
+tôi uống rượu bia hằng ngày và dùng paracetamol,not_in_data,Acetaminophen,Acetaminophen,,1
+Zyrtec với Ventolin,brand,Cetirizine|Salbutamol,Cetirizine|Salbutamol,,1
+"đang uống Depakine và Keppra, mới thêm Rivotril",brand,Clonazepam|Levetiracetam|Valproate,Clonazepam|Levetiracetam|Valproate,,1
+"kiểm tra giúp tôi: amlodipine, atorvastatin, aspirin, metformin, losartan",generic,Amlodipine|Aspirin|Atorvastatin|Losartan|Metformin,Amlodipine|Aspirin|Atorvastatin|Losartan|Metformin,,1
+"tôi bị cảm, uống thuốc cảm thôi",no_drug,,,,1
+fluconazole với glipizide,generic,Fluconazole|Glipizide,Fluconazole|Glipizide,,1

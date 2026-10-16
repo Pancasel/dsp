@@ -63,6 +63,7 @@ def system(tmp_path: Path, monkeypatch: pytest.MonkeyPatch) -> PolypharmacySyste
         "GENE_NAMES_FILE": files["genes"],
         "SIDE_EFFECTS_VI_FILE": files["vi"],
         "SERIOUS_KEYWORDS_FILE": files["serious"],
+        "SERIOUS_EFFECTS_FILE": "",
         "CACHE_DB": tmp_path / "cache.sqlite3",
     }
     for name, path in env.items():

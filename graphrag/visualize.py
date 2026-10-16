@@ -72,4 +72,7 @@ def build_graph_html(
             for drug in sorted({name for pair in item["pairs"] for name in pair}):
                 net.add_edge(f"drug:{drug}", node, color="#fca5a5", width=1)
 
-    return net.generate_html(notebook=False)
+    html = net.generate_html(notebook=False)
+    # vis-network styles tooltips with white-space: nowrap, which would put
+    # the multi-line titles above on a single line.
+    return html.replace("</head>", "<style>.vis-tooltip{white-space:pre-line}</style></head>", 1)

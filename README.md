@@ -69,6 +69,7 @@ result = system.predict([item.stitch_id for item in drugs])
 pytest                                   # dữ liệu tổng hợp + mock, không gọi API
 python eval/run_offline.py               # E1, E4, E5, E6 -> eval/results/
 python eval/run_accuracy.py              # A1-A4 + hình + eval/results/ACCURACY.md (~1 phút)
+python eval/run_coverage.py              # C1-C3: toàn bộ 645 thuốc -> eval/results/COVERAGE.md (~2 phút)
 python eval/e3_llm_groundedness.py --yes-call-api --regimens 10   # E3, CÓ gọi LLM
 ```
 
@@ -78,12 +79,16 @@ Kết quả đầy đủ, bảng và hình nằm trong [eval/results/ACCURACY.md
 
 | Mã | Đánh giá | Kết quả chính |
 |---|---|---|
+| C1–C3 | Toàn bộ 645 thuốc ([COVERAGE.md](eval/results/COVERAGE.md)) | Cache khớp CSV 100% (63,473 cặp, 4,649,441 TDP); 645/645 thuốc có tên và nhận đúng (gõ riêng và trong câu chat); 506 phác đồ phủ mọi thuốc chạy không lỗi, 100% TDP và cạnh bằng chứng hiển thị đúng với CSV |
 | E1 | Nhận dạng tên thuốc (70 câu nhập) | Đúng 98.6%, nhận sai 0 |
 | A1 | Đối chiếu kết quả với CSV gốc (200 phác đồ) | Tier 1 precision = recall = 100% (52,880 TDP); Tier 2 đúng 72/72; 40,529 đường dẫn bằng chứng đúng 100% |
 | A2 | Cầu protein dự đoán cặp có tương tác | AUROC 0.54, gần ngẫu nhiên; baseline độ phổ biến 0.94. Tier 3 chỉ là giả thuyết |
 | A3 | Dự đoán từng tác dụng phụ (giao thức Decagon, 963 TDP) | AUROC 0.951 / AUPRC 0.940 / AP@50 0.966 (baseline 0.908 / 0.889 / 0.883; Decagon công bố 0.872 / 0.832 / 0.803) |
 | E4 | Nhãn Tier 3 trên 2000 cặp bị ẩn | Precision@10 0.507 (phổ biến 0.418, ngẫu nhiên 0.065) |
 | A4 | Validator với dự đoán LLM bị làm sai | Loại 100% (950/950), giữ 100% dự đoán hợp lệ (300/300) |
+| E2 | Trích thuốc từ 30 câu chat thực tế | Đúng 30/30 câu, 0 thuốc nhận nhầm, 0 bỏ sót |
+| A5 | 26 tương tác kinh điển (warfarin + NSAID, "triple whammy"…) | Tác dụng phụ mong đợi lọt top 10 ở 53.8% số ca, top 3 ở 23.1% (giới hạn của dữ liệu chỉ có/không) |
+| A6 | Từ khóa "nghiêm trọng" so với danh sách IME của EMA | Precision 0.92 nhưng recall 0.15 → chuyển sang nhãn IME |
 
 ## Tài nguyên (`resources/`)
 
@@ -94,6 +99,8 @@ Kết quả đầy đủ, bảng và hình nằm trong [eval/results/ACCURACY.md
 | `brand_aliases_vi.csv` | Viết tay, kiểm tra bằng `scripts/check_brand_aliases.py --fill` |
 | `gene_names.csv` | `scripts/build_gene_names.py` (NCBI) |
 | `side_effects_vi.csv` | Dịch thủ công; `scripts/translate_side_effects.py` là tùy chọn và **có gọi LLM** |
-| `serious_keywords.csv` | Viết tay, so khớp nguyên từ |
+| `serious_effects.csv` | `scripts/build_serious_effects.py`: nhãn nghiêm trọng theo danh sách Important Medical Event của EMA (cần internet) |
+| `effect_meddra_map.csv` | Viết tay: tên thông dụng của Decagon → thuật ngữ MedDRA ("heart attack" → Myocardial infarction) |
+| `serious_keywords.csv` | Viết tay: dự phòng cho tên chưa ánh xạ được, nhóm đe dọa tính mạng (`critical`) và các từ loại trừ (`exclude`) |
 
 > Thông tin chỉ mang tính tham khảo ở mức quần thể, không thay thế tư vấn của bác sĩ hoặc dược sĩ.

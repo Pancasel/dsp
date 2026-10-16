@@ -1,0 +1,27 @@
+case,drugs,expected,pair_documented,Chỉ từ khóa|rank,IME|rank,IME + đe dọa tính mạng (mặc định)|rank,"IME + đe dọa tính mạng, bỏ IDF|rank"
+1,warfarin|ibuprofen|acetaminophen,bleeding,1,2,2,2,4
+2,warfarin|aspirin|omeprazole,bleeding,1,4,24,9,11
+3,clopidogrel|aspirin|atorvastatin,bleeding,1,7,25,13,13
+4,warfarin|ciprofloxacin|metoprolol,bleeding,1,7,5,11,10
+5,warfarin|fluconazole|amlodipine,bleeding,1,2,6,2,11
+6,diclofenac|citalopram|amlodipine,bleeding,1,1,1,1,1
+7,ibuprofen|lisinopril|furosemide,kidney,1,3,10,6,5
+8,diclofenac|losartan|hydrochlorothiazide,kidney,0,30,48,33,21
+9,spironolactone|lisinopril|metformin,hyperkalaemia,1,,89,29,24
+10,spironolactone|losartan|amlodipine,hyperkalaemia,1,,9,4,6
+11,verapamil|metoprolol|atorvastatin,bradycardia,1,4,8,6,4
+12,diltiazem|propranolol|omeprazole,bradycardia,1,4,18,5,9
+13,digoxin|amiodarone|furosemide,arrhythmia,1,1,2,1,2
+14,simvastatin|clarithromycin|omeprazole,rhabdomyolysis,1,25,31,30,33
+15,simvastatin|amiodarone|metformin,rhabdomyolysis,1,3,12,4,9
+16,atorvastatin|erythromycin|acetaminophen,rhabdomyolysis,1,5,2,6,8
+17,glibenclamide|fluconazole|amlodipine,hypoglycaemia,1,23,61,26,22
+18,glipizide|ciprofloxacin|metoprolol,hypoglycaemia,0,24,81,31,25
+19,methotrexate|trimethoprim|omeprazole,myelosuppression,1,23,4,28,14
+20,methotrexate|ketorolac|prednisone,myelosuppression,0,18,51,17,11
+21,oxycodone|diazepam|acetaminophen,cns_respiratory_depression,1,2,6,2,2
+22,morphine|alprazolam|omeprazole,cns_respiratory_depression,1,19,36,7,4
+23,tramadol|sertraline|acetaminophen,seizure_serotonin,0,,84,104,103
+24,tramadol|fluoxetine|omeprazole,seizure_serotonin,1,19,82,25,15
+25,sildenafil|isosorbide|atorvastatin,hypotension,1,,,,
+26,haloperidol|citalopram|omeprazole,arrhythmia,1,2,15,3,3
