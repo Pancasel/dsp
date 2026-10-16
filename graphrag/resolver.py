@@ -46,7 +46,7 @@ CHAT_STOPWORDS = {
     "com", "xong", "sau", "truoc", "bua", "sang", "trua", "dem", "ngu",
     "dau", "sot", "ho", "cam", "cum", "gut", "cao", "huyet", "ap", "tieu",
     "duong", "phe", "bung", "benh", "tim", "mach", "viem", "ruou", "bia",
-    "lung", "khop", "day", "hong", "mui", "rang", "met",
+    "lung", "khop", "day", "hong", "mui", "rang", "met", "tong",
 }
 # PubChem synonyms that are ordinary words or abbreviations, never a drug on
 # their own ("vitamin" -> Ergocalciferol, "CoM" -> Mesna, "delta" -> Dronabinol).

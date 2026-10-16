@@ -23,5 +23,5 @@ case,drugs,expected,pair_documented,Chỉ từ khóa|rank,IME|rank,IME + đe d�
 22,morphine|alprazolam|omeprazole,cns_respiratory_depression,1,19,36,7,4
 23,tramadol|sertraline|acetaminophen,seizure_serotonin,0,,84,104,103
 24,tramadol|fluoxetine|omeprazole,seizure_serotonin,1,19,82,25,15
-25,sildenafil|isosorbide|atorvastatin,hypotension,1,,,,
+25,sildenafil|isosorbide dinitrate|atorvastatin,hypotension,1,,,,
 26,haloperidol|citalopram|omeprazole,arrhythmia,1,2,15,3,3

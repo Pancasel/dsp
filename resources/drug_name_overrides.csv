@@ -52,3 +52,37 @@ CID005311297,Montelukast,Chloroquinolinyl-ethenyl-phenyl sulfanylpropyl core of 
 CID006398525,Sucralfate,Formula C11H60Al9O55S8 = aluminium sucrose octasulfate
 CID000002349,Benzylpenicillin,PubChem title Penicillins; formula C16H18N2O4S = benzylpenicillin (penicillin G)
 CID000004730,Phenoxymethylpenicillin,Formula C16H17N2O5S- with phenoxyacetyl side chain = penicillin V
+CID000000159,Epoprostenol,PGI2 C20H32O5; INN epoprostenol
+CID000000271,Calcium,PubChem Ca2+ cation; calcium supplements
+CID000000772,Enoxaparin,Title is a heparin tetrasaccharide; synonyms LMWH; Clexane is the enoxaparin brand
+CID000000853,Levothyroxine,Title (+-)-Thyroxine; synonym Levothyroxine
+CID000000861,Liothyronine,Title DL-Triiodothyronine; synonym DL-Liothyronine
+CID000001206,Methamphetamine,Title DL-methamphetamine
+CID000001302,Naproxen,Title racemic 2-(6-methoxy-2-naphthyl)propionic acid
+CID000001972,Amphotericin B,Heptaene C47H73NO17 = amphotericin B
+CID000002524,Calcitriol,Title Calcitriol Impurities A; synonym 1-alpha-25-Dihydroxycholecalciferol
+CID000002673,Cefradine,PubChem title Cefradin; INN cefradine
+CID000003203,Efavirenz,Title Rac-Efavirenz
+CID000003367,Fludarabine,Title Fludarabine Base
+CID000003405,Folic acid,"Synonyms D-Folic Acid, Vitamin B-11"
+CID000003640,Hydrocortisone,Formula C21H30O5 = hydrocortisone (cortisol)
+CID000003642,Hydrocortisone butyrate,Formula C25H36O6 = hydrocortisone 17-butyrate ester
+CID000003780,Isosorbide dinitrate,"Title Isosorbide dinitrate mixture, C6H8N2O8"
+CID000003928,Lincomycin,Title Lincomycine (French spelling)
+CID000003929,Linezolid,Title rac-Linezolid
+CID000004034,Meclizine,"PubChem title Meclizine, C25H27ClN2"
+CID000004138,Methyldopa,Title Alpha-methyldopa
+CID000004727,Penicillamine,Title (+-)-Penicillamine
+CID000004812,Phytonadione,"Formula C31H46O2 = phylloquinone; synonyms Vitamin K1, Phytomenadione"
+CID000005040,Sirolimus,Synonym Rapamycin (Sirolimus)
+CID000005195,Selegiline,Title (+-)-Selegiline
+CID000005645,Ursodiol,"Synonyms UDCA, 7-beta-hydroxylithocholic acid"
+CID000012620,Docosanol,PubChem title Behenyl Alcohol = docosanol
+CID000028112,Lithium,Record is LiAlH4 (AlH4Li); the only lithium drug is lithium carbonate/citrate; review
+CID000062924,Fluticasone,Formula C22H27F3O4S = fluticasone propionate core; synonym fluticasone
+CID000087177,Lactulose,Maltulose record C12H22O11 (lactulose isomer); mono lists ammonia increased; review
+CID000122316,Rasagiline,Title Racemic rasagiline
+CID000176168,Lanthanum carbonate,Title Lanthanum carbonate hydrate; synonym Fosrenol
+CID004183806,Misoprostol,"Title Misoprostol, 1% in cellulose"
+CID005311048,Cisplatin,Record CH4Cl2N2 = cisplatin without Pt; mono lists blood magnesium decreased; review
+CID006918453,Auranofin,"PubChem title Ridauran, C20H34AuO9PS = auranofin"

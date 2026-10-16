@@ -80,7 +80,7 @@ Kết quả đầy đủ, bảng và hình nằm trong [eval/results/ACCURACY.md
 | Mã | Đánh giá | Kết quả chính |
 |---|---|---|
 | C1–C3 | Toàn bộ 645 thuốc ([COVERAGE.md](eval/results/COVERAGE.md)) | Cache khớp CSV 100% (63,473 cặp, 4,649,441 TDP); 645/645 thuốc có tên và nhận đúng (gõ riêng và trong câu chat); 506 phác đồ phủ mọi thuốc chạy không lỗi, 100% TDP và cạnh bằng chứng hiển thị đúng với CSV |
-| E1 | Nhận dạng tên thuốc (70 câu nhập) | Đúng 98.6%, nhận sai 0 |
+| E1 | Nhận dạng tên thuốc (71 câu nhập) | Đúng 98.6%, nhận sai 0 |
 | A1 | Đối chiếu kết quả với CSV gốc (200 phác đồ) | Tier 1 precision = recall = 100% (52,880 TDP); Tier 2 đúng 72/72; 40,529 đường dẫn bằng chứng đúng 100% |
 | A2 | Cầu protein dự đoán cặp có tương tác | AUROC 0.54, gần ngẫu nhiên; baseline độ phổ biến 0.94. Tier 3 chỉ là giả thuyết |
 | A3 | Dự đoán từng tác dụng phụ (giao thức Decagon, 963 TDP) | AUROC 0.951 / AUPRC 0.940 / AP@50 0.966 (baseline 0.908 / 0.889 / 0.883; Decagon công bố 0.872 / 0.832 / 0.803) |

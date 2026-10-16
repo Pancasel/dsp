@@ -4,11 +4,11 @@ Sinh tự động bởi `python eval/run_offline.py` và `python eval/run_accura
 
 ## E1. Nhận dạng tên thuốc
 
-70 câu nhập (generic, biệt dược VN, kèm hàm lượng, sai chính tả, thuốc không có trong dữ liệu). Độ chính xác **98.6%**, nhận sai **0**, hỏi lại 1.
+71 câu nhập (generic, biệt dược VN, kèm hàm lượng, sai chính tả, thuốc không có trong dữ liệu). Độ chính xác **98.6%**, nhận sai **0**, hỏi lại 1.
 
 | Loại | n | Đúng | Hỏi lại | Sai |
 |---|---|---|---|---|
-| Tên hoạt chất | 20 | 100.0% | 0 | 0 |
+| Tên hoạt chất | 21 | 100.0% | 0 | 0 |
 | Biệt dược VN | 20 | 100.0% | 0 | 0 |
 | Kèm hàm lượng | 10 | 100.0% | 0 | 0 |
 | Sai chính tả | 10 | 90.0% | 1 | 0 |
@@ -138,7 +138,7 @@ Dự đoán hợp lệ và dự đoán bị làm sai có chủ đích (ID bằng
 | 22 | morphine + alprazolam + omeprazole | ức chế thần kinh / hô hấp | 7 |
 | 23 | tramadol + sertraline + acetaminophen | co giật / serotonin | 104 |
 | 24 | tramadol + fluoxetine + omeprazole | co giật / serotonin | 25 |
-| 25 | sildenafil + isosorbide + atorvastatin | tụt huyết áp | không nằm trong nhóm nghiêm trọng |
+| 25 | sildenafil + isosorbide dinitrate + atorvastatin | tụt huyết áp | không nằm trong nhóm nghiêm trọng |
 | 26 | haloperidol + citalopram + omeprazole | loạn nhịp | 3 |
 
 **Diễn giải.** Decagon chỉ cho biết một tác dụng phụ *có* được báo cáo cho cặp thuốc hay không, không có tần suất hay mức độ, nên điểm xếp hạng không phân biệt được tác dụng phụ đặc trưng của tương tác với hàng trăm tác dụng phụ khác của cùng cặp. Khoảng một nửa số ca kinh điển lên được top 10. Thử thêm chuẩn hoá theo độ đặc trưng của thuốc (kiểu PRR) cũng không cải thiện ổn định, nên trọng số không được chỉnh theo bộ 26 ca này để tránh overfit. Hướng cải thiện: dùng số lượng báo cáo FAERS để tính disproportionality thật.

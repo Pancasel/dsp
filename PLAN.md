@@ -35,7 +35,7 @@ Ràng buộc kỹ thuật:
 
 | Bổ sung | Cách làm | Kết quả |
 |---|---|---|
-| Tên thuốc | STITCH `CID0…` → PubChem CID; dự phòng bằng tên SIDER; sửa tay có ghi bằng chứng | 645/645 thuốc có tên (18 CID đã bị PubChem gộp được tra qua "Preferred Compound" và công thức phân tử, ghi bằng chứng trong `drug_name_overrides.csv`) |
+| Tên thuốc | STITCH `CID0…` → PubChem CID; dự phòng bằng tên SIDER; sửa tay có ghi bằng chứng | 645/645 thuốc có tên generic đọc được (18 CID đã bị PubChem gộp được tra qua "Preferred Compound"; 36 tên tạp chất/biệt dược/racemic được chuẩn hoá về INN, ví dụ Dichloromethanediamine → Cisplatin, Clexane → Enoxaparin; bằng chứng trong `drug_name_overrides.csv`) |
 | Biệt dược Việt Nam | Bảng viết tay, có script kiểm tra | 123 biệt dược, 0 lỗi |
 | Tên gene | NCBI `Homo_sapiens.gene_info` | 18,941/19,089 gene |
 | Tiếng Việt | Agent dịch trực tiếp, không gọi API | 1,317 tên phối hợp + 1,320 tên đơn lẻ có hiện trên UI |
@@ -137,7 +137,7 @@ Các trọng số đặt trong `.env`. Tier 2 chỉ áp cho đúng các cặp kh
 
 | Mã | Nội dung | Trạng thái / kết quả |
 |---|---|---|
-| E1 | Resolver trên 70 input (generic, biệt dược, kèm hàm lượng, sai chính tả, không có trong data) | Đúng 98.6%, nhận sai 0. Ca duy nhất không tự nhận ("diazepan") thì hệ thống hỏi lại |
+| E1 | Resolver trên 71 input (generic, biệt dược, kèm hàm lượng, sai chính tả, không có trong data) | Đúng 98.6%, nhận sai 0. Ca duy nhất không tự nhận ("diazepan") thì hệ thống hỏi lại |
 | E3 | Tỷ lệ dự đoán của LLM qua được validator | Chưa chạy, cần API: `eval/e3_llm_groundedness.py --yes-call-api` |
 | E4 | Ứng viên Tier 3 trên 2000 cặp bị ẩn | precision@10: đồ thị 0.507, phổ biến toàn cục 0.418, ngẫu nhiên 0.065. Hit@10: 0.966 / 0.946 / 0.420 |
 | E5 | Ngưỡng hub 100 → không giới hạn | Số cầu Tier 3 trung bình tăng 3.6 → 4.4, số hub bị loại giảm 41.5 → 0. Ngưỡng 500 giữ 98% số cầu |

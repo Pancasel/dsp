@@ -1,5 +1,6 @@
 query,expected_name,category
 paracetamol,Acetaminophen,generic
+levothyroxine,Levothyroxine,generic
 Acetaminophen,Acetaminophen,generic
 ibuprofen,Ibuprofen,generic
 aspirin,Aspirin,generic
@@ -63,7 +64,7 @@ PARACETAMOL,Acetaminophen,case
 Ibuprofen,Ibuprofen,case
 WARFARIN,Warfarin,case
 esomeprazole,,not_in_data
-levothyroxine,,not_in_data
+sitagliptin,,not_in_data
 Nexium,,not_in_data
 Vitamin C,,not_in_data
 Thuốc ho Bảo Thanh,,not_in_data

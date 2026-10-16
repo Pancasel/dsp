@@ -2,7 +2,7 @@
 
 Sinh tự động bởi `python eval/run_coverage.py` (seed 0, không gọi LLM). Mọi kiểm tra đối chiếu với file CSV gốc, đọc độc lập với cache SQLite.
 
-C3 chạy 506 phác đồ phủ mọi thuốc; mỗi thuốc xuất hiện ít nhất 3 lần; trung bình 0.032 s/phác đồ.
+C3 chạy 506 phác đồ phủ mọi thuốc; mỗi thuốc xuất hiện ít nhất 3 lần; trung bình 0.031 s/phác đồ.
 
 | Kiểm tra | Đạt | Tổng | Tỷ lệ |
 |---|---|---|---|

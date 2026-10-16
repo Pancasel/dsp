@@ -23,5 +23,5 @@ case,drugs,interacting_pair,expected,mechanism
 22,morphine|alprazolam|omeprazole,morphine|alprazolam,cns_respiratory_depression,opioid + benzodiazepine (FDA boxed warning)
 23,tramadol|sertraline|acetaminophen,tramadol|sertraline,seizure_serotonin,serotonin syndrome and lowered seizure threshold
 24,tramadol|fluoxetine|omeprazole,tramadol|fluoxetine,seizure_serotonin,serotonin syndrome and lowered seizure threshold (CYP2D6)
-25,sildenafil|isosorbide|atorvastatin,sildenafil|isosorbide,hypotension,PDE5 inhibitor + nitrate (contraindicated)
+25,sildenafil|isosorbide dinitrate|atorvastatin,sildenafil|isosorbide dinitrate,hypotension,PDE5 inhibitor + nitrate (contraindicated)
 26,haloperidol|citalopram|omeprazole,haloperidol|citalopram,arrhythmia,additive QT prolongation
