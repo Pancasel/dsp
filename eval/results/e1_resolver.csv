@@ -1,0 +1,71 @@
+query,category,expected,got,method,score,outcome
+paracetamol,generic,Acetaminophen,Acetaminophen,brand_alias,100.0,correct
+Acetaminophen,generic,Acetaminophen,Acetaminophen,exact,100.0,correct
+ibuprofen,generic,Ibuprofen,Ibuprofen,exact,100.0,correct
+aspirin,generic,Aspirin,Aspirin,brand_alias,100.0,correct
+warfarin,generic,Warfarin,Warfarin,exact,100.0,correct
+metformin,generic,Metformin,Metformin,exact,100.0,correct
+simvastatin,generic,Simvastatin,Simvastatin,exact,100.0,correct
+atorvastatin,generic,Atorvastatin,Atorvastatin,exact,100.0,correct
+omeprazole,generic,Omeprazole,Omeprazole,exact,100.0,correct
+amlodipine,generic,Amlodipine,Amlodipine,exact,100.0,correct
+losartan,generic,Losartan,Losartan,exact,100.0,correct
+clopidogrel,generic,Clopidogrel,Clopidogrel,exact,100.0,correct
+digoxin,generic,Digoxin,Digoxin,exact,100.0,correct
+amiodarone,generic,Amiodarone,Amiodarone,exact,100.0,correct
+furosemide,generic,Furosemide,Furosemide,exact,100.0,correct
+diazepam,generic,Diazepam,Diazepam,exact,100.0,correct
+fluoxetine,generic,Fluoxetine,Fluoxetine,exact,100.0,correct
+ciprofloxacin,generic,Ciprofloxacin,Ciprofloxacin,exact,100.0,correct
+clarithromycin,generic,Clarithromycin,Clarithromycin,exact,100.0,correct
+carbamazepine,generic,Carbamazepine,Carbamazepine,exact,100.0,correct
+Panadol,brand_vi,Acetaminophen,Acetaminophen,brand_alias,100.0,correct
+Efferalgan,brand_vi,Acetaminophen,Acetaminophen,brand_alias,100.0,correct
+Hapacol,brand_vi,Acetaminophen,Acetaminophen,brand_alias,100.0,correct
+Brufen,brand_vi,Ibuprofen,Ibuprofen,brand_alias,100.0,correct
+Coumadin,brand_vi,Warfarin,Warfarin,brand_alias,100.0,correct
+Glucophage,brand_vi,Metformin,Metformin,brand_alias,100.0,correct
+Lipitor,brand_vi,Atorvastatin,Atorvastatin,brand_alias,100.0,correct
+Losec,brand_vi,Omeprazole,Omeprazole,brand_alias,100.0,correct
+Amlor,brand_vi,Amlodipine,Amlodipine,brand_alias,100.0,correct
+Cozaar,brand_vi,Losartan,Losartan,brand_alias,100.0,correct
+Plavix,brand_vi,Clopidogrel,Clopidogrel,brand_alias,100.0,correct
+Cordarone,brand_vi,Amiodarone,Amiodarone,brand_alias,100.0,correct
+Lasix,brand_vi,Furosemide,Furosemide,brand_alias,100.0,correct
+Seduxen,brand_vi,Diazepam,Diazepam,brand_alias,100.0,correct
+Prozac,brand_vi,Fluoxetine,Fluoxetine,brand_alias,100.0,correct
+Ciprobay,brand_vi,Ciprofloxacin,Ciprofloxacin,brand_alias,100.0,correct
+Klacid,brand_vi,Clarithromycin,Clarithromycin,brand_alias,100.0,correct
+Tegretol,brand_vi,Carbamazepine,Carbamazepine,brand_alias,100.0,correct
+Concor,brand_vi,Bisoprolol,Bisoprolol,brand_alias,100.0,correct
+Voltaren,brand_vi,Diclofenac,Diclofenac,brand_alias,100.0,correct
+Panadol 500mg,with_strength,Acetaminophen,Acetaminophen,brand_alias,100.0,correct
+Hapacol 250,with_strength,Acetaminophen,Acetaminophen,brand_alias,100.0,correct
+Glucophage XR 750 mg,with_strength,Metformin,Metformin,brand_alias,100.0,correct
+Amlor 5mg viên nang,with_strength,Amlodipine,Amlodipine,brand_alias,100.0,correct
+Lipitor 20 mg viên nén bao phim,with_strength,Atorvastatin,Atorvastatin,brand_alias,100.0,correct
+Losartan kali 50mg,with_strength,Losartan,Losartan,exact,100.0,correct
+Diclofenac natri 75mg,with_strength,Diclofenac,Diclofenac,exact,100.0,correct
+Aspirin 81mg,with_strength,Aspirin,Aspirin,brand_alias,100.0,correct
+Seduxen 5 mg,with_strength,Diazepam,Diazepam,brand_alias,100.0,correct
+Ciprofloxacin 500mg,with_strength,Ciprofloxacin,Ciprofloxacin,exact,100.0,correct
+ibuprofn,typo,Ibuprofen,Ibuprofen,fuzzy,94.1,correct
+wafarin,typo,Warfarin,Warfarin,fuzzy,93.3,correct
+metfomin,typo,Metformin,Metformin,fuzzy,94.1,correct
+amlodipin,typo,Amlodipine,Amlodipine,fuzzy,94.7,correct
+omeprazol,typo,Omeprazole,Omeprazole,brand_alias,100.0,correct
+furosemid,typo,Furosemide,Furosemide,brand_alias,100.0,correct
+amoxicilin,typo,Amoxicillin,Amoxicillin,brand_alias,100.0,correct
+clopidogrell,typo,Clopidogrel,Clopidogrel,fuzzy,95.7,correct
+simvastatine,typo,Simvastatin,Simvastatin,exact,100.0,correct
+diazepan,typo,Diazepam,,ambiguous,87.5,asked
+PARACETAMOL,case,Acetaminophen,Acetaminophen,brand_alias,100.0,correct
+Ibuprofen,case,Ibuprofen,Ibuprofen,exact,100.0,correct
+WARFARIN,case,Warfarin,Warfarin,exact,100.0,correct
+esomeprazole,not_in_data,,,ambiguous,90.9,correct
+levothyroxine,not_in_data,,,ambiguous,92.3,correct
+Nexium,not_in_data,,,not_found,62.7,correct
+Vitamin C,not_in_data,,,ambiguous,91.2,correct
+Thuốc ho Bảo Thanh,not_in_data,,,not_found,61.5,correct
+abc,not_in_data,,,not_found,63.3,correct
+insulin,not_in_data,,,ambiguous,85.7,correct

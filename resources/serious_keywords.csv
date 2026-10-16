@@ -1,0 +1,59 @@
+keyword,category
+haemorrhage,bleeding
+hemorrhage,bleeding
+bleeding,bleeding
+haematemesis,bleeding
+melaena,bleeding
+arrhythmia,cardiac
+fibrillation,cardiac
+tachycardia ventricular,cardiac
+torsade,cardiac
+qt prolonged,cardiac
+cardiac arrest,cardiac
+cardiac failure,cardiac
+heart failure,cardiac
+myocardial infarction,cardiac
+bradycardia,cardiac
+heart block,cardiac
+hypotension,cardiac
+renal failure,renal
+kidney failure,renal
+acute kidney,renal
+nephropathy,renal
+hepatic failure,hepatic
+liver failure,hepatic
+hepatitis,hepatic
+hepatotoxicity,hepatic
+jaundice,hepatic
+rhabdomyolysis,musculoskeletal
+serotonin syndrome,neurologic
+neuroleptic malignant,neurologic
+convulsion,neurologic
+seizure,neurologic
+coma,neurologic
+stroke,neurologic
+cerebrovascular accident,neurologic
+respiratory depression,respiratory
+respiratory arrest,respiratory
+respiratory failure,respiratory
+apnoea,respiratory
+pulmonary embolism,thrombotic
+thrombosis,thrombotic
+anaphylactic,allergic
+anaphylaxis,allergic
+angioedema,allergic
+stevens-johnson,skin
+toxic epidermal necrolysis,skin
+agranulocytosis,haematologic
+pancytopenia,haematologic
+neutropenia,haematologic
+thrombocytopenia,haematologic
+aplastic anaemia,haematologic
+hypoglycaemia,metabolic
+hyperkalaemia,metabolic
+hyponatraemia,metabolic
+lactic acidosis,metabolic
+pancreatitis,gastrointestinal
+gastrointestinal perforation,gastrointestinal
+sepsis,infection
+death,fatal

@@ -1,0 +1,34 @@
+stitch_id,name,evidence
+CID000006691,Warfarin,"Deprecated PubChem CID; mono profile lists prothrombin time prolonged, coagulation time prolonged and many haemorrhage terms"
+CID000000158,Dinoprostone,SIDER name PGE2
+CID000000214,Alprostadil,SIDER name PGE1; synonym Alprostadil (PGE1)
+CID000000564,Aminocaproic acid,SIDER name EACA; synonym aminocaproic acid
+CID000002283,Bacitracin,PubChem title is the bacitracin A peptide IUPAC name
+CID000002909,Cyclosporine,PubChem title Cyclosporine;Ciclosporin
+CID000002978,Dronabinol,Synonym Delta 9-THC
+CID000003222,Enalapril,Synonym (R;S;S)-enalapril
+CID000003249,Ergocalciferol,Synonym VITAMIN D2
+CID000003385,Fluorouracil,Synonym fluorouracil; SIDER 5-FU
+CID000004075,Mesalamine,Synonym mesalamine / Mesalazine
+CID000005538,Tretinoin,Title Tretinoina (INN-Spanish)
+CID000005647,Valacyclovir,SIDER name VACV
+CID000005651,Vancomycin,SIDER name Vancocine
+CID000040976,Etonogestrel,SIDER name Implanon
+CID003081884,Glatiramer,Title Glatiramer (acetate)
+CID000024011,Selenium sulfide,Title Selenium sulfide (SeS)
+CID000024486,Calcium chloride,Title Calcium chloride 6-hydrate
+CID000054374,Octreotide,Title is the octreotide peptide sequence
+CID004475485,Rosuvastatin,Title Rosuvastatin EP Impurity L
+CID005311039,Caspofungin,Title Caspofungin impurity
+CID005473385,Thioguanine,Title 2-Amino-3;5-dihydropurine-6-thione
+CID000060147,Tamsulosin,Title (+)-Tamsulosin
+CID000060865,Olopatadine,Title (E)-Olopatadine
+CID000027686,Cromolyn,Bis-chromone-2-carboxylic acid linked by 2-hydroxypropoxy (cromoglicic acid)
+CID000048175,Halobetasol,"17-(2-chloroacetyl)-6,9-difluoro corticosteroid propanoate (halobetasol propionate)"
+CID000060696,Rocuronium,2-morpholino 16-allylpyrrolidinium steroid 17-acetate
+CID000060831,Tiotropium,Scopine ester of di(thiophen-2-yl)glycolic acid
+CID000072467,Bleomycin,Title is the bleomycin A2 IUPAC name
+CID000163742,Fondaparinux,Title is the fondaparinux pentasaccharide sequence
+CID005311082,Eptifibatide,Title deamino-Cys-hArg-Gly-Asp-Trp-Pro-Cys
+CID006447131,Pimecrolimus,Molecular formula C43H68ClNO11
+CID009571074,Cefditoren,Cephalosporin with (Z)-2-(4-methylthiazol-5-yl)ethenyl side chain

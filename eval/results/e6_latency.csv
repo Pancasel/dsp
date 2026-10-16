@@ -1,0 +1,4 @@
+k,pairs,regimens,retrieve_seconds_mean,retrieve_seconds_p95,evidence_mean,documented_effects_mean
+3,3,30,0.0167,0.0728,62.8,60.5
+5,10,30,0.0476,0.1025,189.5,179.6
+8,28,30,0.1178,0.2942,294.8,318.9

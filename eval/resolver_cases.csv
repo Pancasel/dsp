@@ -1,0 +1,71 @@
+query,expected_name,category
+paracetamol,Acetaminophen,generic
+Acetaminophen,Acetaminophen,generic
+ibuprofen,Ibuprofen,generic
+aspirin,Aspirin,generic
+warfarin,Warfarin,generic
+metformin,Metformin,generic
+simvastatin,Simvastatin,generic
+atorvastatin,Atorvastatin,generic
+omeprazole,Omeprazole,generic
+amlodipine,Amlodipine,generic
+losartan,Losartan,generic
+clopidogrel,Clopidogrel,generic
+digoxin,Digoxin,generic
+amiodarone,Amiodarone,generic
+furosemide,Furosemide,generic
+diazepam,Diazepam,generic
+fluoxetine,Fluoxetine,generic
+ciprofloxacin,Ciprofloxacin,generic
+clarithromycin,Clarithromycin,generic
+carbamazepine,Carbamazepine,generic
+Panadol,Acetaminophen,brand_vi
+Efferalgan,Acetaminophen,brand_vi
+Hapacol,Acetaminophen,brand_vi
+Brufen,Ibuprofen,brand_vi
+Coumadin,Warfarin,brand_vi
+Glucophage,Metformin,brand_vi
+Lipitor,Atorvastatin,brand_vi
+Losec,Omeprazole,brand_vi
+Amlor,Amlodipine,brand_vi
+Cozaar,Losartan,brand_vi
+Plavix,Clopidogrel,brand_vi
+Cordarone,Amiodarone,brand_vi
+Lasix,Furosemide,brand_vi
+Seduxen,Diazepam,brand_vi
+Prozac,Fluoxetine,brand_vi
+Ciprobay,Ciprofloxacin,brand_vi
+Klacid,Clarithromycin,brand_vi
+Tegretol,Carbamazepine,brand_vi
+Concor,Bisoprolol,brand_vi
+Voltaren,Diclofenac,brand_vi
+Panadol 500mg,Acetaminophen,with_strength
+Hapacol 250,Acetaminophen,with_strength
+Glucophage XR 750 mg,Metformin,with_strength
+Amlor 5mg viên nang,Amlodipine,with_strength
+Lipitor 20 mg viên nén bao phim,Atorvastatin,with_strength
+Losartan kali 50mg,Losartan,with_strength
+Diclofenac natri 75mg,Diclofenac,with_strength
+Aspirin 81mg,Aspirin,with_strength
+Seduxen 5 mg,Diazepam,with_strength
+Ciprofloxacin 500mg,Ciprofloxacin,with_strength
+ibuprofn,Ibuprofen,typo
+wafarin,Warfarin,typo
+metfomin,Metformin,typo
+amlodipin,Amlodipine,typo
+omeprazol,Omeprazole,typo
+furosemid,Furosemide,typo
+amoxicilin,Amoxicillin,typo
+clopidogrell,Clopidogrel,typo
+simvastatine,Simvastatin,typo
+diazepan,Diazepam,typo
+PARACETAMOL,Acetaminophen,case
+Ibuprofen,Ibuprofen,case
+WARFARIN,Warfarin,case
+esomeprazole,,not_in_data
+levothyroxine,,not_in_data
+Nexium,,not_in_data
+Vitamin C,,not_in_data
+Thuốc ho Bảo Thanh,,not_in_data
+abc,,not_in_data
+insulin,,not_in_data
