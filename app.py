@@ -7,8 +7,10 @@ analysis sends at most one LLM request.
 """
 
 import json
+import re
 import unicodedata
 
+import pandas as pd
 import streamlit as st
 import streamlit.components.v1 as components
 
@@ -136,76 +138,147 @@ def choose_candidate(system: PolypharmacySystem, index: int, candidate: dict | N
     analyse_if_ready(system)
 
 
-def badge(tier: int, label: str) -> str:
-    return (
-        f"<span style='background:{TIER_COLORS[tier]};color:white;padding:2px 8px;"
-        f"border-radius:10px;font-size:0.8em'>Tier {tier} · {label}</span>"
+EVIDENCE_REF = re.compile(r"\s*\(CID\d+\)|\s*\((?:E\d+(?:\s*(?:,|;|và|and|&)\s*)?)+\)|\bE\d+\b")
+TIER_ICON = {1: "🔵 Tier 1", 2: "🟠 Tier 2", 3: "🟣 Tier 3"}
+CSS = """
+<style>
+.block-container {max-width: 1250px; padding-top: 2rem;}
+[data-testid="stMetricValue"] {font-size: 1.6rem;}
+[data-testid="stMetricLabel"] {font-size: 0.85rem; color: #6b7280;}
+.legend span {display:inline-block; margin-right:14px; font-size:0.85rem; color:#4b5563;}
+.dot {display:inline-block; width:10px; height:10px; border-radius:50%; margin-right:5px;}
+.effect-title {font-size:1.02rem; font-weight:600;}
+.effect-sub {color:#6b7280; font-size:0.85rem; margin-bottom:0.4rem;}
+</style>
+"""
+
+
+def clean_explanation(text: str) -> str:
+    """The LLM cites evidence ids (E1, E2); users never see those ids."""
+    text = EVIDENCE_REF.sub("", text)
+    return re.sub(r"\s{2,}", " ", re.sub(r"\s+([,.;])", r"", text)).strip()
+
+
+def pair_text(pairs: list) -> str:
+    return "; ".join(" + ".join(pair) for pair in pairs)
+
+
+def legend() -> None:
+    st.markdown(
+        "<div class='legend'>"
+        + "".join(
+            f"<span><i class='dot' style='background:{TIER_COLORS[t]}'></i>{TIER_ICON[t].split(' ', 1)[1]}: "
+            f"{label}</span>"
+            for t, label in ((1, "đã ghi nhận"), (2, "khuếch đại qua protein chung"), (3, "giả thuyết, cần kiểm chứng"))
+        )
+        + "</div>",
+        unsafe_allow_html=True,
     )
 
 
-def render_interaction(item: dict, key: str) -> None:
-    with st.container(border=True):
-        mark = "⚠️ " if item["serious"] else ""
-        english = (
-            f" <span style='color:gray'>({item['side_effect_en']})</span>"
-            if item["side_effect_vi"] != item["side_effect_en"] else ""
+def render_effect_detail(rank: int, item: dict) -> None:
+    vi, en = item["side_effect_vi"], item["side_effect_en"]
+    label = f"{rank}. {'⚠️ ' if item['serious'] else ''}{vi}" + (f"  ·  {en}" if vi != en else "")
+    with st.expander(label, expanded=rank == 1):
+        st.markdown(
+            f"<div class='effect-sub'>{TIER_ICON[item['tier']]} · {item['tier_label']} &nbsp;|&nbsp; "
+            f"{pair_text(item['pairs'])}</div>",
+            unsafe_allow_html=True,
         )
-        st.markdown(f"{badge(item['tier'], item['tier_label'])} &nbsp; **{mark}{item['side_effect_vi']}**{english}",
-                    unsafe_allow_html=True)
-        st.caption("Cặp thuốc: " + "; ".join(" + ".join(pair) for pair in item["pairs"]))
+        st.write(clean_explanation(item["explanation_vi"]))
         if item["amplified_pairs"]:
-            st.caption("Khuếch đại (protein đích chung với thuốc thứ ba) ở: "
-                       + "; ".join(" + ".join(pair) for pair in item["amplified_pairs"]))
-        st.write(item["explanation_vi"])
-        with st.expander("Bằng chứng"):
-            st.caption(TIER_HELP[item["tier"]])
-            for evidence in item["evidence"]:
-                st.code(evidence["path_text"], language=None)
+            st.info("Khuếch đại do protein đích chung với thuốc thứ ba ở: " + pair_text(item["amplified_pairs"]))
+        st.caption(TIER_HELP[item["tier"]])
+        for evidence in item["evidence"]:
+            st.code(evidence["path_text"], language=None)
+
+
+def effects_table(items: list[dict]) -> pd.DataFrame:
+    return pd.DataFrame(
+        {
+            "Mức": [TIER_ICON[i["tier"]] for i in items],
+            "Tác dụng phụ": [("⚠️ " if i["serious"] else "") + i["side_effect_vi"] for i in items],
+            "Tên tiếng Anh": [i["side_effect_en"] for i in items],
+            "Cặp thuốc": [pair_text(i["pairs"]) for i in items],
+        }
+    )
 
 
 def render_result(result: dict, key: str) -> None:
-    st.caption(result["disclaimer"])
-    if result["llm_status"] != "ok":
-        st.caption(f"Giải thích đang dùng mẫu có sẵn (LLM không dùng được: {result['llm_error']}).")
-
-    with st.expander("💊 Thông tin từng thuốc", expanded=False):
-        for drug in result["drugs"]:
-            aliases = f" — biệt dược: {', '.join(drug['aliases_vi'][:4])}" if drug["aliases_vi"] else ""
-            st.markdown(f"**{drug['name']}**{aliases}")
-            targets = (f"Protein đích ({drug['target_count']}): {', '.join(drug['target_genes'][:6])}"
-                       if drug["has_targets"] else "Không có dữ liệu protein đích")
-            st.caption(f"{drug['stitch_id']} · {targets}")
-            effects = [("⚠️ " if e["serious"] else "") + e["name_vi"] for e in drug["individual_side_effects"][:6]]
-            if effects:
-                st.caption("Tác dụng phụ khi dùng riêng: " + "; ".join(effects))
-
-    serious = [item for item in result["interactions"] if item["serious"]]
-    other = [item for item in result["interactions"] if not item["serious"]]
-    st.markdown("**⚠️ Tác dụng phụ nguy hiểm nhất khi phối hợp**")
-    if not serious:
-        st.info("Không có tác dụng phụ nghiêm trọng nào được ghi nhận cho phác đồ này.")
-    for index, item in enumerate(serious):
-        render_interaction(item, f"{key}_s{index}")
-    if other:
-        with st.expander(f"Tác dụng phụ khác thường gặp ({len(other)})"):
-            for index, item in enumerate(other):
-                render_interaction(item, f"{key}_o{index}")
-
     cov = result["coverage"]
-    notes = [f"{cov['pairs_with_data']}/{cov['pairs_total']} cặp có dữ liệu",
-             f"{cov['documented_effects_total']} tác dụng phụ đã ghi nhận (đã lọc ra những cái nguy hiểm nhất)"]
-    if cov["drugs_without_targets"]:
-        notes.append("không có dữ liệu protein: " + ", ".join(cov["drugs_without_targets"]))
-    st.caption(" · ".join(notes))
-    if result["mechanism_bridges"]:
-        with st.expander("Liên kết protein giữa các cặp chưa có dữ liệu (chưa phải kết luận)"):
-            for bridge in result["mechanism_bridges"]:
-                st.code(f"{' + '.join(bridge['drug_pair_names'])}: {bridge['path_text']}", language=None)
+    interactions = result["interactions"]
+    serious = [i for i in interactions if i["serious"]]
+    other = [i for i in interactions if not i["serious"]]
+
+    if result["llm_status"] != "ok":
+        st.warning(f"Giải thích đang dùng mẫu có sẵn, LLM không dùng được: {result['llm_error']}")
+
+    cols = st.columns(4)
+    cols[0].metric("Số thuốc", len(result["drugs"]))
+    cols[1].metric("Cặp có dữ liệu", f"{cov['pairs_with_data']}/{cov['pairs_total']}")
+    cols[2].metric("Nguy hiểm nhất", len(serious))
+    cols[3].metric("Tổng đã ghi nhận", cov["documented_effects_total"])
+
+    tab_main, tab_drugs, tab_mech = st.tabs(["⚠️ Tác dụng phụ khi phối hợp", "💊 Từng thuốc", "🧬 Cơ chế protein"])
+
+    with tab_main:
+        legend()
+        if not serious:
+            st.info("Không có tác dụng phụ nghiêm trọng nào được ghi nhận cho phác đồ này.")
+        else:
+            st.dataframe(effects_table(serious), hide_index=True, width="stretch",
+                         height=min(38 * len(serious) + 40, 420))
+            st.markdown("**Giải thích chi tiết**")
+            for index, item in enumerate(serious, start=1):
+                render_effect_detail(index, item)
+        if other:
+            with st.expander(f"Tác dụng phụ khác thường gặp ({len(other)})"):
+                st.dataframe(effects_table(other), hide_index=True, width="stretch")
+                for index, item in enumerate(other, start=len(serious) + 1):
+                    render_effect_detail(index, item)
+
+    with tab_drugs:
+        rows = []
+        for drug in result["drugs"]:
+            top = [("⚠️ " if e["serious"] else "") + e["name_vi"] for e in drug["individual_side_effects"][:4]]
+            rows.append({
+                "Thuốc": drug["name"],
+                "Biệt dược": ", ".join(drug["aliases_vi"][:4]) or "–",
+                "Protein đích": f"{drug['target_count']}: " + ", ".join(drug["target_genes"][:5])
+                if drug["has_targets"] else "Không có dữ liệu",
+                "Tác dụng phụ khi dùng riêng": "; ".join(top) or "–",
+            })
+        st.dataframe(pd.DataFrame(rows), hide_index=True, width="stretch")
+        if cov["drugs_without_targets"]:
+            st.caption("Không có dữ liệu protein đích: " + ", ".join(cov["drugs_without_targets"])
+                       + ". Với các thuốc này chỉ có bằng chứng Tier 1.")
+
+    with tab_mech:
+        if result["pair_summary"]:
+            st.markdown("**Dữ liệu theo từng cặp thuốc**")
+            st.dataframe(
+                pd.DataFrame([{"Cặp thuốc": " + ".join(p["pair"]), "Đã ghi nhận": p["documented_effects"],
+                               "Nghiêm trọng": p["serious_effects"]} for p in result["pair_summary"]]),
+                hide_index=True, width="stretch",
+            )
+        if result["shared_targets"]:
+            st.markdown("**Protein đích chung của từ 3 thuốc trở lên**")
+            for share in result["shared_targets"]:
+                st.write(f"`{share['protein']}`: " + ", ".join(share["drugs"]))
+        if result["mechanism_bridges"]:
+            with st.expander("Liên kết protein giữa các cặp chưa có dữ liệu (chưa phải kết luận)"):
+                for bridge in result["mechanism_bridges"]:
+                    st.code(f"{' + '.join(bridge['drug_pair_names'])}: {bridge['path_text']}", language=None)
+        elif not result["shared_targets"]:
+            st.caption("Không có protein chung hay cầu nối protein nào cho phác đồ này.")
+
+    st.caption(result["disclaimer"])
     st.download_button("Tải kết quả JSON", json.dumps(result, ensure_ascii=False, indent=2),
                        file_name="ket_qua_tuong_tac.json", mime="application/json", key=f"dl_{key}")
 
 
 # ---------------------------------------------------------------- layout
+st.markdown(CSS, unsafe_allow_html=True)
 st.title("💊 Hỏi đáp tác dụng phụ khi phối hợp thuốc")
 try:
     system = load_system()
@@ -233,7 +306,7 @@ with st.sidebar:
             say(f"Đã bỏ {name}.")
             analyse_if_ready(system)
             st.rerun()
-    if st.button("🗑 Phác đồ mới", use_container_width=True):
+    if st.button("🗑 Phác đồ mới", width="stretch"):
         st.session_state.update(messages=[{"role": "assistant", "content": WELCOME}], regimen={}, pending=[], result=None)
         st.rerun()
 

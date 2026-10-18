@@ -1,0 +1,21 @@
+case,drugs,interacting_pair,expected,mechanism
+27,warfarin|amiodarone|atorvastatin|metformin,warfarin|amiodarone,bleeding,amiodarone inhibits CYP2C9 and raises the anticoagulant effect of warfarin
+28,digoxin|verapamil|furosemide|lisinopril,digoxin|verapamil,bradycardia,verapamil raises digoxin levels and adds AV-node depression
+29,simvastatin|diltiazem|metformin|omeprazole,simvastatin|diltiazem,rhabdomyolysis,CYP3A4 inhibition raises simvastatin exposure
+30,sildenafil|nitroglycerin|metoprolol|aspirin,sildenafil|nitroglycerin,hypotension,PDE5 inhibitor + nitrate (contraindicated)
+31,methotrexate|trimethoprim|omeprazole|prednisone,methotrexate|trimethoprim,myelosuppression,additive antifolate effect
+32,lisinopril|spironolactone|potassium chloride|furosemide|metformin,spironolactone|potassium chloride,hyperkalaemia,potassium-sparing diuretic + potassium supplement
+33,oxycodone|lorazepam|gabapentin|acetaminophen|omeprazole,oxycodone|lorazepam,cns_respiratory_depression,opioid + benzodiazepine (FDA boxed warning)
+34,linezolid|sertraline|metformin|atorvastatin|amlodipine,linezolid|sertraline,seizure_serotonin,MAO inhibition + SSRI: serotonin syndrome
+35,glipizide|fluconazole|lisinopril|atorvastatin|aspirin,glipizide|fluconazole,hypoglycaemia,fluconazole inhibits CYP2C9 metabolism of the sulfonylurea
+36,metoprolol|verapamil|atorvastatin|metformin|omeprazole,metoprolol|verapamil,bradycardia,additive AV-node depression (non-DHP CCB + beta blocker)
+37,warfarin|metronidazole|metformin|lisinopril|atorvastatin|omeprazole,warfarin|metronidazole,bleeding,metronidazole inhibits warfarin metabolism and raises INR
+38,ibuprofen|lisinopril|hydrochlorothiazide|metformin|atorvastatin|omeprazole,ibuprofen|lisinopril,kidney,"""triple whammy"": NSAID + ACE inhibitor + thiazide"
+39,clopidogrel|aspirin|warfarin|atorvastatin|metoprolol|omeprazole,clopidogrel|warfarin,bleeding,antiplatelet + anticoagulant
+40,morphine|diazepam|amitriptyline|omeprazole|metformin|lisinopril,morphine|diazepam,cns_respiratory_depression,opioid + benzodiazepine (FDA boxed warning)
+41,warfarin|amiodarone|digoxin|furosemide|metformin|atorvastatin|omeprazole|lisinopril,warfarin|amiodarone,bleeding,amiodarone inhibits CYP2C9 and raises the anticoagulant effect of warfarin
+42,simvastatin|clarithromycin|amlodipine|metformin|lisinopril|omeprazole|aspirin|metoprolol,simvastatin|clarithromycin,rhabdomyolysis,CYP3A4 inhibition raises simvastatin exposure
+43,tramadol|fluoxetine|ibuprofen|omeprazole|metformin|lisinopril|atorvastatin|amlodipine,tramadol|fluoxetine,seizure_serotonin,serotonin syndrome and lowered seizure threshold (CYP2D6)
+44,spironolactone|lisinopril|potassium chloride|furosemide|metformin|atorvastatin|aspirin|metoprolol,spironolactone|lisinopril,hyperkalaemia,potassium-sparing diuretic + ACE inhibitor
+45,methotrexate|ketorolac|omeprazole|prednisone|metformin|lisinopril|atorvastatin|amlodipine,methotrexate|ketorolac,myelosuppression,NSAID reduces renal clearance of methotrexate
+46,sildenafil|isosorbide dinitrate|metoprolol|aspirin|atorvastatin|metformin|omeprazole|lisinopril,sildenafil|isosorbide dinitrate,hypotension,PDE5 inhibitor + nitrate (contraindicated)

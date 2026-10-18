@@ -89,6 +89,8 @@ Kết quả đầy đủ, bảng và hình nằm trong [eval/results/ACCURACY.md
 | E2 | Trích thuốc từ 30 câu chat thực tế | Đúng 30/30 câu, 0 thuốc nhận nhầm, 0 bỏ sót |
 | A5 | 26 tương tác kinh điển (warfarin + NSAID, "triple whammy"…) | Tác dụng phụ mong đợi lọt top 10 ở 53.8% số ca, top 3 ở 23.1% (giới hạn của dữ liệu chỉ có/không) |
 | A6 | Từ khóa "nghiêm trọng" so với danh sách IME của EMA | Precision 0.92 nhưng recall 0.15 → chuyển sang nhãn IME |
+| A7 | Tương tác kinh điển khi thêm thuốc "nhiễu" (`python eval/run_scaling.py`) | Hit@10 53.8% (3 thuốc) → 51.5% / 49.2% / 37.7% / 39.2% (4 / 5 / 6 / 8 thuốc); ngẫu nhiên chỉ 10.9% → 4.7%. Hit@3 giảm 23.1% → 9.2% |
+| A8 | 20 phác đồ 4–8 thuốc viết tay, mỗi phác đồ có 1 cặp tương tác kinh điển (`eval/clinical_benchmark_multi.csv`, `python eval/run_multi.py`; chưa được bác sĩ rà) | 18/20 ca chấm được (2 ca không có dữ liệu cho cặp); Hit@10 27.8% (5/18), Hit@3 11.1%; ngẫu nhiên 6.4%. 4–5 thuốc: 33.3%; 6–8 thuốc: 22.2% |
 
 ## Tài nguyên (`resources/`)
 
