@@ -4,6 +4,8 @@
 
 **Đầu vào:** chat bình thường, ví dụ *“tôi đang uống Panadol với ibuprofen và warfarin”*. Hệ thống tự nhận tên hoạt chất, biệt dược Việt Nam, tên sai chính tả nhẹ hoặc kèm hàm lượng. Tên nào chưa chắc chắn thì hệ thống hỏi lại bằng nút chọn. Gõ **bỏ <tên thuốc>** để bỏ một thuốc, **làm lại** để bắt đầu phác đồ mới.
 
+Ngoài chat, chọn **Tạo phác đồ** để tìm thuốc theo tên hoạt chất, biệt dược hoặc tên đồng nghĩa, thêm từng thuốc vào danh sách và tra cứu khi đủ ít nhất 3 thuốc.
+
 **Đầu ra:**
 - Từng thuốc là gì: tên generic, biệt dược, protein đích, tác dụng phụ khi dùng riêng.
 - **Tối đa 10 tác dụng phụ nghiêm trọng nhất** khi phối hợp (các tác dụng phụ khác gom trong một mục thu gọn), chia 3 tầng:

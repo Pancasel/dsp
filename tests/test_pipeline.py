@@ -101,6 +101,7 @@ def test_predict_without_llm_uses_template_fallback(system: PolypharmacySystem) 
     assert top["side_effect_vi"] == "xuất huyết tiêu hóa"
     assert top["serious"] is True
     assert top["explanation_source"] == "template"
+    assert top["explanation_vi"].startswith("Trong dữ liệu, mình thấy")
     assert top["evidence"][0]["path_text"]
     assert body["coverage"]["pairs_total"] == 6
     assert body["coverage"]["pairs_with_data"] == 2

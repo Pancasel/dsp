@@ -65,3 +65,37 @@ def test_empty_content_reports_finish_reason(monkeypatch: pytest.MonkeyPatch) ->
     _respond(monkeypatch, {"choices": [{"finish_reason": "length", "message": {"content": ""}}]})
     with pytest.raises(LLMResponseError, match="finish_reason=length"):
         generate_predictions(_settings(), ["D1"], {})
+
+
+def test_request_prompt_encourages_natural_tone_without_weakening_safety(
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
+    import httpx
+
+    from graphrag.llm import SYSTEM_PROMPT, generate_predictions
+
+    payloads = []
+
+    def post(self, url, **kwargs):
+        payloads.append(kwargs["json"])
+        body = {
+            "choices": [
+                {
+                    "finish_reason": "stop",
+                    "message": {
+                        "content": '{"predictions": []}',
+                    },
+                }
+            ]
+        }
+        return httpx.Response(200, json=body, request=httpx.Request("POST", url))
+
+    monkeypatch.setattr(httpx.Client, "post", post)
+    generate_predictions(_settings(), ["D1"], {"evidence": []})
+
+    sent_prompt = payloads[0]["messages"][0]["content"]
+    assert sent_prompt == SYSTEM_PROMPT
+    assert "nói tự nhiên, ấm áp và rõ ràng" in sent_prompt
+    assert "tránh lặp khuôn" in sent_prompt
+    assert "không khẳng định chắc chắn" in sent_prompt
+    assert "không khuyên bắt đầu, ngừng hay đổi thuốc" in sent_prompt
