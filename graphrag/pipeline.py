@@ -31,7 +31,7 @@ from graphrag.presenter import (
     pair_summary,
     shared_targets,
 )
-from graphrag.resolver import DrugResolver, ResolveResult
+from graphrag.resolver import DrugResolver
 
 
 class RegimenError(ValueError):
@@ -86,23 +86,6 @@ class PolypharmacySystem:
             "llm_configured": bool(self.settings.llm_api_key),
             "llm_model": self.settings.llm_model,
         }
-
-    def list_drugs(self) -> list[dict[str, object]]:
-        items = []
-        for drug in self.graph.drug_ids:
-            display = self.names.drug_display(drug)
-            items.append(
-                {
-                    "stitch_id": drug,
-                    "name": display["name"],
-                    "aliases_vi": display["aliases_vi"],
-                    "has_targets": bool(self.graph.targets.get(drug)),
-                }
-            )
-        return sorted(items, key=lambda item: str(item["name"]).casefold())
-
-    def search(self, query: str) -> ResolveResult:
-        return self.resolver.resolve(query)
 
     def resolve_regimen(self, inputs: list[str]) -> tuple[list[str], dict[str, dict[str, object]]]:
         cleaned = [item.strip() for item in inputs if item and item.strip()]

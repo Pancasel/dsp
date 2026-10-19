@@ -572,33 +572,38 @@ class DecagonGraph:
             for edge in path
         )
 
-    def retrieve(
-        self,
-        drugs: list[str],
-        is_serious: Callable[[str], bool] | None = None,
-        weights: RankingWeights | None = None,
-        is_critical: Callable[[str], bool] | None = None,
-    ) -> tuple[dict[str, object], list[Evidence]]:
-        targets_by_drug = {drug: self.targets.get(drug, set()) for drug in drugs}
-        regimen_targets = set().union(*targets_by_drug.values()) if drugs else set()
-        shared_targets: dict[str, list[str]] = {}
+    @staticmethod
+    def _shared_targets(targets_by_drug: dict[str, set[str]]) -> dict[str, list[str]]:
+        """Proteins targeted by at least three drugs -> the sorted drugs that target them."""
+        regimen_targets = set().union(*targets_by_drug.values()) if targets_by_drug else set()
+        shared: dict[str, list[str]] = {}
         for protein in regimen_targets:
             owners = sorted(
                 drug for drug, targets in targets_by_drug.items() if protein in targets
             )
             if len(owners) >= 3:
-                shared_targets[protein] = owners
+                shared[protein] = owners
+        return shared
 
-        pairs = list(itertools.combinations(sorted(drugs), 2))
-        pair_effects = self._pair_side_effects(pairs)
-        proteins_by_pair: dict[tuple[str, str], list[str]] = {}
+    @staticmethod
+    def _proteins_by_pair(shared_targets: dict[str, list[str]]) -> dict[tuple[str, str], list[str]]:
+        by_pair: dict[tuple[str, str], list[str]] = {}
         for protein, owners in shared_targets.items():
             for drug_a, drug_b in itertools.combinations(owners, 2):
-                proteins_by_pair.setdefault((drug_a, drug_b), []).append(protein)
+                by_pair.setdefault((drug_a, drug_b), []).append(protein)
+        return by_pair
 
-        amplified_pairs = {
-            pair for pair in proteins_by_pair if pair_effects.get(pair)
-        }
+    def _rank_pair_effects(
+        self,
+        pairs: list[tuple[str, str]],
+        pair_effects: dict[tuple[str, str], list[SideEffect]],
+        proteins_by_pair: dict[tuple[str, str], list[str]],
+        is_serious: Callable[[str], bool] | None,
+        weights: RankingWeights | None,
+        is_critical: Callable[[str], bool] | None,
+    ):
+        """Score the regimen's documented effects and order each pair's list by that score."""
+        amplified_pairs = {pair for pair in proteins_by_pair if pair_effects.get(pair)}
         ranked = rank_effects(
             {pair: effects for pair, effects in pair_effects.items() if effects},
             amplified_pairs,
@@ -614,73 +619,125 @@ class DecagonGraph:
         rank_of = {item.code: index for index, item in enumerate(ranked)}
         for pair in pairs:
             pair_effects[pair].sort(key=lambda effect: rank_of.get(effect.code, len(rank_of)))
+        return ranked
 
+    @staticmethod
+    def _documented_candidates(
+        pair: tuple[str, str],
+        effects: list[SideEffect],
+        shared_proteins: list[str],
+    ) -> tuple[list[_Candidate], list[_Candidate]]:
+        """Tier 1 candidates for a documented pair, plus Tier 2 when targets are shared."""
+        drug_a, drug_b = pair
+        tier1 = [
+            _Candidate(
+                tier=1,
+                kind="known_pairwise_effect",
+                drug_pair=pair,
+                path=(
+                    {
+                        "source": drug_a,
+                        "relation": "has_side_effect",
+                        "target": drug_b,
+                        "side_effect_code": effect.code,
+                        "side_effect_name": effect.name,
+                    },
+                ),
+                effect=effect,
+            )
+            for effect in effects
+        ]
+        tier2: list[_Candidate] = []
+        if shared_proteins:
+            targets_path = [
+                {"source": drug, "relation": "targets", "target": protein}
+                for protein in shared_proteins
+                for drug in (drug_a, drug_b)
+            ]
+            tier2 = [
+                _Candidate(
+                    tier=2,
+                    kind="shared_target_amplification",
+                    drug_pair=pair,
+                    path=tuple(
+                        targets_path
+                        + [
+                            {
+                                "source": drug_a,
+                                "relation": "has_side_effect",
+                                "target": drug_b,
+                                "side_effect_code": effect.code,
+                                "side_effect_name": effect.name,
+                            }
+                        ]
+                    ),
+                    effect=effect,
+                )
+                for effect in effects
+            ]
+        return tier1, tier2
+
+    def _bridge_candidates(
+        self,
+        pair: tuple[str, str],
+        bridges: list[tuple[str, str, str | None]],
+    ) -> list[_Candidate]:
+        """Tier 3 candidates: protein bridges between two drugs with no documented effect."""
+        drug_a, drug_b = pair
+        candidates = tuple(self.tier3_candidates(drug_a, drug_b))
+        group: list[_Candidate] = []
+        for protein_a, protein_b, intermediate in bridges:
+            path: list[dict[str, str]] = [
+                {"source": drug_a, "relation": "targets", "target": protein_a},
+                {
+                    "source": protein_a,
+                    "relation": "interacts_with",
+                    "target": protein_b if intermediate is None else intermediate,
+                },
+            ]
+            if intermediate is not None:
+                path.append(
+                    {"source": intermediate, "relation": "interacts_with", "target": protein_b}
+                )
+            path.append({"source": drug_b, "relation": "targets", "target": protein_b})
+            group.append(
+                _Candidate(
+                    tier=3,
+                    kind="novel_pair_protein_bridge",
+                    drug_pair=pair,
+                    path=tuple(path),
+                    candidates=candidates,
+                )
+            )
+        return group
+
+    def _collect_candidates(
+        self,
+        pairs: list[tuple[str, str]],
+        pair_effects: dict[tuple[str, str], list[SideEffect]],
+        proteins_by_pair: dict[tuple[str, str], list[str]],
+        targets_by_drug: dict[str, set[str]],
+        regimen_targets: set[str],
+    ):
+        """Per-pair candidate groups for each tier, the pruned hubs and a truncation flag."""
         tier1_groups: list[list[_Candidate]] = []
         tier2_groups: list[list[_Candidate]] = []
         tier3_groups: list[list[_Candidate]] = []
         pruned_hubs: set[str] = set()
         truncated = False
 
-        for drug_a, drug_b in pairs:
-            pair = (drug_a, drug_b)
+        for pair in pairs:
+            drug_a, drug_b = pair
             effects = pair_effects[pair]
             if effects:
-                tier1_groups.append(
-                    [
-                        _Candidate(
-                            tier=1,
-                            kind="known_pairwise_effect",
-                            drug_pair=pair,
-                            path=(
-                                {
-                                    "source": drug_a,
-                                    "relation": "has_side_effect",
-                                    "target": drug_b,
-                                    "side_effect_code": effect.code,
-                                    "side_effect_name": effect.name,
-                                },
-                            ),
-                            effect=effect,
-                        )
-                        for effect in effects
-                    ]
-                )
                 shared_proteins = sorted(proteins_by_pair.get(pair, []))
                 if len(shared_proteins) > MAX_SHARED_PROTEINS_IN_PATH:
                     truncated = True
                     shared_proteins = shared_proteins[:MAX_SHARED_PROTEINS_IN_PATH]
-                if shared_proteins:
-                    tier2_groups.append(
-                        [
-                            _Candidate(
-                                tier=2,
-                                kind="shared_target_amplification",
-                                drug_pair=pair,
-                                path=tuple(
-                                    [
-                                        {
-                                            "source": drug,
-                                            "relation": "targets",
-                                            "target": protein,
-                                        }
-                                        for protein in shared_proteins
-                                        for drug in (drug_a, drug_b)
-                                    ]
-                                    + [
-                                        {
-                                            "source": drug_a,
-                                            "relation": "has_side_effect",
-                                            "target": drug_b,
-                                            "side_effect_code": effect.code,
-                                            "side_effect_name": effect.name,
-                                        }
-                                    ]
-                                ),
-                                effect=effect,
-                            )
-                            for effect in effects
-                        ]
-                    )
+                tier1, tier2 = self._documented_candidates(pair, effects, shared_proteins)
+                tier1_groups.append(tier1)
+                if tier2:
+                    tier2_groups.append(tier2)
                 continue
 
             bridges, bridge_truncated = self._bridges_for_pair(
@@ -690,44 +747,19 @@ class DecagonGraph:
                 pruned_hubs,
             )
             truncated = truncated or bridge_truncated
-            if not bridges:
-                continue
-            candidates = tuple(self.tier3_candidates(drug_a, drug_b))
-            group: list[_Candidate] = []
-            for protein_a, protein_b, intermediate in bridges:
-                path: list[dict[str, str]] = [
-                    {"source": drug_a, "relation": "targets", "target": protein_a},
-                    {
-                        "source": protein_a,
-                        "relation": "interacts_with",
-                        "target": protein_b if intermediate is None else intermediate,
-                    },
-                ]
-                if intermediate is not None:
-                    path.append(
-                        {
-                            "source": intermediate,
-                            "relation": "interacts_with",
-                            "target": protein_b,
-                        }
-                    )
-                path.append(
-                    {"source": drug_b, "relation": "targets", "target": protein_b}
-                )
-                group.append(
-                    _Candidate(
-                        tier=3,
-                        kind="novel_pair_protein_bridge",
-                        drug_pair=pair,
-                        path=tuple(path),
-                        candidates=candidates,
-                    )
-                )
-            tier3_groups.append(group)
+            if bridges:
+                tier3_groups.append(self._bridge_candidates(pair, bridges))
+        return tier1_groups, tier2_groups, tier3_groups, pruned_hubs, truncated
 
-        selected_tier1, tier1_truncated = _take_round_robin(
-            tier1_groups, self.max_evidence
-        )
+    def _select_evidence(
+        self,
+        groups: tuple[list[list[_Candidate]], list[list[_Candidate]], list[list[_Candidate]]],
+        drugs: list[str],
+        regimen_targets: set[str],
+    ) -> tuple[list[Evidence], bool]:
+        """Spread the evidence budget over pairs, tier by tier, and number the items E1, E2, ..."""
+        tier1_groups, tier2_groups, tier3_groups = groups
+        selected_tier1, tier1_truncated = _take_round_robin(tier1_groups, self.max_evidence)
         selected_tier2, tier2_truncated = _take_round_robin(
             tier2_groups, self.max_evidence - len(selected_tier1)
         )
@@ -735,7 +767,6 @@ class DecagonGraph:
             tier3_groups,
             self.max_evidence - len(selected_tier1) - len(selected_tier2),
         )
-        truncated = truncated or tier1_truncated or tier2_truncated or tier3_truncated
         selected = [
             item
             for item in selected_tier1 + selected_tier2 + selected_tier3
@@ -754,6 +785,33 @@ class DecagonGraph:
             )
             for index, item in enumerate(selected, start=1)
         ]
+        return evidence, tier1_truncated or tier2_truncated or tier3_truncated
+
+    def retrieve(
+        self,
+        drugs: list[str],
+        is_serious: Callable[[str], bool] | None = None,
+        weights: RankingWeights | None = None,
+        is_critical: Callable[[str], bool] | None = None,
+    ) -> tuple[dict[str, object], list[Evidence]]:
+        targets_by_drug = {drug: self.targets.get(drug, set()) for drug in drugs}
+        regimen_targets = set().union(*targets_by_drug.values()) if drugs else set()
+        shared_targets = self._shared_targets(targets_by_drug)
+
+        pairs = list(itertools.combinations(sorted(drugs), 2))
+        pair_effects = self._pair_side_effects(pairs)
+        proteins_by_pair = self._proteins_by_pair(shared_targets)
+        ranked = self._rank_pair_effects(
+            pairs, pair_effects, proteins_by_pair, is_serious, weights, is_critical
+        )
+
+        tier1, tier2, tier3, pruned_hubs, truncated = self._collect_candidates(
+            pairs, pair_effects, proteins_by_pair, targets_by_drug, regimen_targets
+        )
+        evidence, selection_truncated = self._select_evidence(
+            (tier1, tier2, tier3), drugs, regimen_targets
+        )
+        truncated = truncated or selection_truncated
 
         proteins_in_paths = {
             endpoint
@@ -769,25 +827,19 @@ class DecagonGraph:
         }
         assignments = sum(len(genes) for genes in targets_by_drug.values())
         if assignments <= DIRECT_TARGET_LIST_LIMIT:
-            direct_targets = {
-                drug: sorted(targets_by_drug[drug]) for drug in drugs
-            }
+            direct_targets = {drug: sorted(targets_by_drug[drug]) for drug in drugs}
         else:
             direct_targets = {
                 drug: sorted(targets_by_drug[drug] & kept_proteins) for drug in drugs
             }
-        shared_list = [
-            {"protein": protein, "drugs": owners}
-            for protein, owners in sorted(shared_targets.items())
-        ]
-
         graph_context: dict[str, object] = {
             "drugs": drugs,
             "direct_targets": direct_targets,
-            "direct_target_counts": {
-                drug: len(targets_by_drug[drug]) for drug in drugs
-            },
-            "shared_targets": shared_list,
+            "direct_target_counts": {drug: len(targets_by_drug[drug]) for drug in drugs},
+            "shared_targets": [
+                {"protein": protein, "drugs": owners}
+                for protein, owners in sorted(shared_targets.items())
+            ],
             "ranked_effects": [item.to_dict() for item in ranked],
             "pairs_with_documented_effects": [
                 list(pair) for pair in pairs if pair_effects[pair]

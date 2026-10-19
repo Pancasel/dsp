@@ -162,9 +162,6 @@ class DrugResolver:
             return ResolveResult(raw, best.stitch_id, best.name, "fuzzy", best.score, candidates)
         return ResolveResult(raw, None, None, "ambiguous", best.score, candidates)
 
-    def resolve_many(self, text: str) -> list[ResolveResult]:
-        return [self.resolve(part) for part in split_query(text)]
-
     def extract(self, text: str) -> list[ResolveResult]:
         """Find the drugs mentioned in a free-text chat message.
 

@@ -64,15 +64,6 @@ def test_split_query_handles_combinations() -> None:
     ]
 
 
-def test_resolve_many(resolver: DrugResolver) -> None:
-    results = resolver.resolve_many("Panadol, Brufen; Coumadin")
-    assert [item.stitch_id for item in results] == [
-        "CID000001983",
-        "CID000003672",
-        "CID000006691",
-    ]
-
-
 @pytest.mark.parametrize(
     ("message", "expected"),
     [

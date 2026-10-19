@@ -10,8 +10,8 @@
   - **Tier 1**: đã ghi nhận trong dữ liệu.
   - **Tier 2**: khuếch đại qua protein đích chung.
   - **Tier 3**: giả thuyết suy ra qua cầu protein.
-- Mỗi kết quả kèm đường dẫn bằng chứng và giải thích tiếng Việt.
-- **Đồ thị quan hệ** tương tác được, đặt cạnh khung chat (bật/tắt ở thanh bên). Đồ thị gồm thuốc, số tác dụng phụ của từng cặp, protein đích chung, protein cầu nối và các tác dụng phụ nghiêm trọng.
+- Mỗi kết quả là một thẻ gồm tên tác dụng phụ, cặp thuốc được báo cáo, mô tả ngắn bằng tiếng Việt (do LLM viết, mang tính chung) và mục "Bằng chứng" thu gọn.
+- **Chi tiết thêm** (mục thu gọn trong câu trả lời): thông tin từng thuốc, cơ chế protein và **đồ thị quan hệ** tương tác được. Đồ thị gồm thuốc, số tác dụng phụ của từng cặp, protein đích chung, protein cầu nối và các tác dụng phụ nghiêm trọng.
 
 Xem [PLAN.md](PLAN.md) để biết thiết kế, đánh giá dữ liệu và kết quả thí nghiệm.
 

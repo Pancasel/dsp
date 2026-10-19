@@ -73,13 +73,10 @@ def system(tmp_path: Path, monkeypatch: pytest.MonkeyPatch) -> PolypharmacySyste
     return PolypharmacySystem.load(Settings.from_env())
 
 
-def test_status_and_search(system: PolypharmacySystem) -> None:
+def test_status(system: PolypharmacySystem) -> None:
     status = system.status()
     assert status["drugs"] == 6
     assert status["drugs_with_names"] == 3
-    assert system.search("Alphadol 500mg").stitch_id == "D1"
-    assert system.search("zzzz").stitch_id is None
-    assert system.list_drugs()[0]["name"] == "Alphazol"
 
 
 def test_regimen_validation(system: PolypharmacySystem) -> None:
