@@ -134,10 +134,12 @@ def template_explanation(item: dict[str, object], names: NameIndex, graph_contex
     pairs = [
         " và ".join(names.drug_name(drug) for drug in pair) for pair in item["pairs"]
     ]
-    text = f"Đã ghi nhận \"{effect}\" khi dùng đồng thời {'; '.join(pairs[:3])}"
-    text += f" (thêm {len(pairs) - 3} cặp khác)." if len(pairs) > 3 else "."
-    if item["recurrence"] and int(item["recurrence"]) > 1:
-        text += f" Tác dụng phụ này xuất hiện ở {item['recurrence']} cặp trong phác đồ."
+    count = int(item["recurrence"])
+    text = f"Trong dữ liệu, mình thấy {effect} được ghi nhận"
+    if count > 1:
+        text += f" ở {count} cặp trong phác đồ"
+    text += f": {'; '.join(pairs[:3])}"
+    text += f" và {count - 3} cặp khác." if count > 3 else "."
     if item.get("amplified"):
         shared = [
             entry
@@ -147,13 +149,15 @@ def template_explanation(item: dict[str, object], names: NameIndex, graph_contex
         if shared:
             proteins = ", ".join(names.gene_symbol(entry["protein"]) for entry in shared[:3])
             drugs = ", ".join(names.drug_name(d) for d in shared[0]["drugs"])
-            text += f" {drugs} cùng tác động lên protein {proteins}, có thể làm tăng nguy cơ."
+            text += (
+                f" Mình cũng thấy {drugs} có protein đích chung ({proteins}); "
+                "đây là thông tin về cơ chế, chưa đủ để khẳng định nguy cơ tăng."
+            )
     if not item.get("not_in_mono"):
-        # not_in_mono is False only when, for every pair, at least one of the
-        # two drugs already lists this effect on its own.
         text += (
-            " Lưu ý: tác dụng phụ này cũng đã được ghi nhận khi dùng riêng ít nhất "
-            "một thuốc trong mỗi cặp, nên chưa chắc là do phối hợp."
+            " Có một điểm cần lưu ý: tác dụng phụ này cũng xuất hiện trong dữ liệu "
+            "khi dùng riêng ít nhất một thuốc ở mỗi cặp, nên chưa thể quy riêng "
+            "cho việc phối hợp."
         )
     return text
 
