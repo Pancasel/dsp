@@ -1,0 +1,349 @@
+% ---------------------------------------------------------------------------
+% Chapter 4 body: "Experiments and Results" -> Section 4.1 "Implementation".
+%
+% Drop this file next to the other chapters of the main report and include
+% it with, e.g.:
+%
+%   \input{report_src/chapter4_implementation}
+%
+% right after Chapter 3 ("Methodology") ends. It assumes the surrounding
+% document is a LaTeX `report`-class project (the same class used for the
+% existing chapters: \chapter / \section / \subsection, table numbers of the
+% form <chapter>.<n>). It needs amsmath and booktabs; both are loaded by
+% report_src/standalone_preview.tex if you want to compile this file alone.
+% ---------------------------------------------------------------------------
+
+\chapter{Experiments and Results}
+\label{chap:experiments}
+
+\section{Implementation}
+\label{sec:implementation}
+
+This section describes how the Graph-RAG pipeline of Chapter~3 is realised
+as a working system: the concrete data artefacts consumed at run time
+(Section~\ref{sec:data}), the software architecture
+(Section~\ref{sec:architecture}), the retrieval and ranking parameters
+(Section~\ref{sec:retrieval-impl}), how the large language model (LLM) is
+invoked and prompted (Section~\ref{sec:llm-usage}), and how its output is
+validated before being shown to a user (Section~\ref{sec:grounding}).
+
+\subsection{Data}
+\label{sec:data}
+
+The knowledge graph is built directly from the Decagon dataset, distributed
+by the Stanford SNAP BioSNAP collection\footnote{\url{https://snap.stanford.edu/decagon/}}
+as four plain CSV files; the fourth, \texttt{bio-decagon-mono.csv}, is
+optional and is used only as a ranking feature (Section~\ref{sec:retrieval-impl}),
+never for retrieval. Table~\ref{tab:data-summary} reports the exact size of
+each file as distributed -- obtained by loading all four files with no
+filtering -- and matches the totals already summarised in Section~1.3.2 up
+to the small differences expected from counting raw rows rather than
+deduplicated entities.
+
+\begin{table}[t]
+  \caption{Decagon dataset, as distributed (unfiltered row and entity counts)}
+  \label{tab:data-summary}
+  \centering
+  \begin{tabular}{@{}lrl@{}}
+    \toprule
+    File & Rows & Key entities \\
+    \midrule
+    \texttt{bio-decagon-targets.csv}         & 18{,}690    & 284 drugs, 3{,}648 proteins \\
+    \texttt{bio-decagon-ppi.csv}             & 715{,}612   & 19{,}081 proteins \\
+    \texttt{bio-decagon-combo.csv}           & 4{,}649{,}441 & 645 drugs, 63{,}473 drug pairs, 1{,}317 effect codes \\
+    \texttt{bio-decagon-mono.csv} (optional) & 174{,}977   & 639 drugs, 10{,}184 effect codes \\
+    \bottomrule
+  \end{tabular}
+\end{table}
+
+Two structural properties of the graph directly motivated implementation
+choices in Section~\ref{sec:retrieval-impl}. First, both the drug--target
+and the protein--protein subgraphs are heavily right-skewed
+(Table~\ref{tab:degree}): half of all drugs bind at most 11 proteins, yet
+one outlier binds 2{,}840, and half of all proteins have at most 33
+interaction partners, yet the busiest protein has 2{,}519. Treating every
+protein identically during bridge search would let a handful of such hub
+proteins connect almost any two drugs through a biologically uninformative
+path. Fixing \texttt{hub\_degree\_threshold} at 500 (Table~\ref{tab:bounds})
+removes only the extreme tail -- 220 of 19{,}081 proteins (1.15\%), close to
+the 99th percentile of the observed degree distribution -- while leaving the
+rest of the PPI network intact.
+
+\begin{table}[t]
+  \caption{Degree-distribution statistics of the drug--target and protein--protein graphs}
+  \label{tab:degree}
+  \centering
+  \begin{tabular}{@{}lrrrrrr@{}}
+    \toprule
+    Degree & Min & Median & Mean & P90 & P99 & Max \\
+    \midrule
+    Targets per drug            & 1 & 11 & 65.8 & 170 & 206 & 2{,}840 \\
+    Drugs per target protein    & 1 & 1  & 5.1  & 5   & 78  & 94 \\
+    PPI neighbours per protein  & 1 & 33 & 75.0 & 201 & 525 & 2{,}519 \\
+    \bottomrule
+  \end{tabular}
+\end{table}
+
+Second, the 645 drugs that carry documented pairwise history in
+\texttt{bio-decagon-combo.csv} are \emph{not} the same population as the 284
+drugs listed in \texttt{bio-decagon-targets.csv}: only 284 of the 645 (44\%)
+have a known target set. For the remaining 361 drugs, Tier-1 evidence (a
+documented pairwise effect, Table~3.2) is still available whenever the pair
+itself was tested, but Tier-2 amplification and Tier-3 bridging are
+reachable only for drugs with target annotations, since both require a
+protein-level path. This asymmetry is a property of the released data, not
+of the retrieval algorithm, and bounds how much mechanistic -- as opposed to
+purely historical -- evidence the pipeline can offer for target-unannotated
+drugs.
+
+Third, the volume of documented pairwise history is itself heavy-tailed at
+two levels (Table~\ref{tab:effect-freq}). A drug pair that has \emph{any}
+documented effect has a median of 53 and up to 540 of them, which is why
+effects are ranked (Eq.~\eqref{eq:score}) rather than listed in full; and a
+given effect code is documented for a median of 1{,}596 pairs but as few as
+1, which is why the inverse-frequency term of Eq.~\eqref{eq:idf} matters in
+practice. Of the 1{,}317 distinct effect codes present in the raw file, 963
+occur in at least 500 pairs -- matching, within one effect, the 964 side
+effects that Zitnik et al.~[1] report evaluating after applying the same
+frequency cut-off -- while the remaining $\sim$350 codes are comparatively
+rare and receive a correspondingly larger $I(e)$ rather than being dropped.
+
+\begin{table}[t]
+  \caption{Side-effect frequency statistics in \texttt{bio-decagon-combo.csv}}
+  \label{tab:effect-freq}
+  \centering
+  \begin{tabular}{@{}lrrrrrr@{}}
+    \toprule
+     & Min & Median & Mean & P90 & P99 & Max \\
+    \midrule
+    Effects per documented pair      & 1 & 53      & 73.3    & 165   & 305    & 540 \\
+    Pairs documenting a given effect & 1 & 1{,}596 & 3{,}530.3 & 9{,}530 & 21{,}396 & 28{,}568 \\
+    \bottomrule
+  \end{tabular}
+\end{table}
+
+These characteristics also shape how the raw files are turned into a
+queryable graph at run time. Drug--target and protein--protein interaction
+edges are loaded once into in-memory adjacency maps
+(\texttt{dict[str, set[str]]}), giving $O(1)$ neighbour look-ups during
+retrieval. The combination file, at 4{,}649{,}441 rows, is not re-parsed on
+every run: it is materialised once into a local SQLite cache
+(\texttt{side\_effects(drug\_a, drug\_b, effect\_code, effect\_name)},
+stored \texttt{WITHOUT ROWID} with a composite primary key, plus an index on
+\texttt{drug\_b} for symmetric pair look-ups), together with two derived
+tables used directly by the ranking formula of
+Section~\ref{sec:retrieval-impl}: \texttt{effect\_counts} ($n_e$, the number
+of pairs documenting each effect) and \texttt{stats} ($N$, the total number
+of distinct documented pairs). A SHA-256 signature of each source file's
+size and modification time, together with a cache-schema version, is stored
+in a \texttt{metadata} table; the cache is rebuilt automatically only when a
+source file or the schema changes, which keeps repeated start-ups fast and
+avoids re-reading millions of rows on every process launch.
+
+A free-text drug name typed by a user -- including Vietnamese brand names,
+typos, or several drugs written in one sentence -- is resolved to a Decagon
+STITCH identifier by a dedicated resolver. Resolution is attempted, in
+order, against (i) a STITCH-ID pattern, (ii) an exact match on normalised
+generic names, synonyms, or Vietnamese brand aliases, and (iii) fuzzy string
+matching (RapidFuzz\footnote{\url{https://github.com/rapidfuzz/RapidFuzz}},
+indel ratio), accepted automatically above a score of 90 and otherwise
+offered only as a suggestion above 75. A curated stop-word list removes
+conversational filler (dosage, timing, and symptom words, in both
+Vietnamese and English) before matching, so that a message such as
+\emph{"em đang uống panadol với ibuprofen"} resolves to the two intended
+drugs rather than being treated as one unmatched phrase. Name resolution
+and prompt serialisation draw on five supporting resource tables, built
+offline by the \texttt{scripts/} utilities: canonical generic names per
+STITCH ID, Vietnamese brand aliases, gene symbols, Vietnamese translations
+of effect names, and two curated lists marking EMA Important Medical
+Events and life-threatening effects.
+
+\subsection{Software Architecture}
+\label{sec:architecture}
+
+The system is implemented in Python. Table~\ref{tab:modules} summarises the
+responsibility of each module under \texttt{graphrag/}; \texttt{app.py} is a
+Streamlit\footnote{\url{https://streamlit.io}} front-end that calls the
+single orchestration entry point, \texttt{PolypharmacySystem.predict()}.
+Configuration -- file paths, the LLM endpoint and model, and the retrieval
+and ranking parameters of Table~\ref{tab:bounds} -- is read from
+environment variables through a \texttt{.env} file, so the retrieval bounds
+and the model used for generation can be changed without editing code.
+External dependencies are kept deliberately small: \texttt{httpx} for the
+synchronous HTTP call to the LLM provider, \texttt{pydantic} for schema
+validation of the LLM's output, \texttt{rapidfuzz} for name resolution, and
+\texttt{pyvis} for rendering the interaction graph in the user interface.
+
+\begin{table}[t]
+  \caption{Module responsibilities}
+  \label{tab:modules}
+  \centering
+  \begin{tabular}{@{}ll@{}}
+    \toprule
+    Module & Responsibility \\
+    \midrule
+    \texttt{config.py}            & Environment-driven settings, ranking weights \\
+    \texttt{dataset.py}           & Graph loading, SQLite cache, subgraph retrieval \\
+    \texttt{names.py} / \texttt{resolver.py} & Name normalisation and drug-name resolution \\
+    \texttt{ranking.py}           & Regimen-level effect scoring (Sec.~\ref{sec:retrieval-impl}) \\
+    \texttt{llm.py}               & Prompt construction, API call, schema validation \\
+    \texttt{presenter.py}         & Assembling evidence into UI-ready structures \\
+    \texttt{pipeline.py}          & \texttt{PolypharmacySystem}: end-to-end orchestration \\
+    \texttt{visualize.py}         & Interaction-graph rendering (PyVis) \\
+    \bottomrule
+  \end{tabular}
+\end{table}
+
+\subsection{Subgraph Retrieval, Pruning, and Ranking}
+\label{sec:retrieval-impl}
+
+Retrieval follows the six steps of Table~3.1, subject to the bounds in
+Table~\ref{tab:bounds}. A protein is pruned as a generic hub, and excluded
+from any bridge, once its number of PPI neighbours exceeds
+\texttt{hub\_degree\_threshold}; a direct target of a queried drug is always
+retained regardless of degree. Tier-3 bridge search is bounded per drug
+pair (\texttt{tier3\_one\_hop\_per\_pair}, \texttt{tier3\_two\_hop\_per\_pair})
+and stops as soon as both caps are full and one further candidate has
+confirmed that more bridges exist, so the search is deterministic and never
+silently under-reports truncation. The total evidence serialised to the LLM
+is capped at \texttt{max\_evidence} and allocated across drug pairs by
+round-robin selection, so that a single high-degree pair cannot consume the
+whole budget. Documented evidence is built only for the effects that will be
+shown, and Tier~2 and Tier~3 each have a reserved quarter of the budget, so
+Tier~1 cannot starve them; unused slots go to the other tiers.
+
+\begin{table}[t]
+  \caption{Retrieval and pruning bounds (default values)}
+  \label{tab:bounds}
+  \centering
+  \begin{tabular}{@{}lrl@{}}
+    \toprule
+    Parameter & Default & Role \\
+    \midrule
+    \texttt{hub\_degree\_threshold}      & 500 & PPI degree above which a protein is pruned \\
+    \texttt{max\_evidence}               & 400 & Cap on evidence items serialised to the LLM \\
+    \texttt{tier3\_one\_hop\_per\_pair}  & 8   & Max.\ 1-hop bridges sampled per undocumented pair \\
+    \texttt{tier3\_two\_hop\_per\_pair}  & 4   & Max.\ 2-hop bridges sampled per undocumented pair \\
+    \texttt{tier3\_candidates\_per\_pair}& 20  & Max.\ candidate labels offered for a Tier-3 pair \\
+    \texttt{max\_serious/other\_effects} & 10 / 5 & Effects surfaced per analysis after ranking \\
+    \bottomrule
+  \end{tabular}
+\end{table}
+
+Because a documented drug pair can list dozens to hundreds of side effects
+(a median of 53, up to 540, in Decagon), the effects of each pair are never
+shown unranked. Every documented effect $e$ in the regimen receives a
+transparent, additive score,
+\begin{equation}
+  \mathrm{score}(e) = w_r R(e) + w_i I(e) + w_m M(e) + w_s S(e)
+                     + w_c\big[S(e)\wedge C(e)\big] + w_a A(e),
+  \label{eq:score}
+\end{equation}
+where $R(e)$ is the number of regimen drug pairs that document $e$
+(recurrence); $M(e)$, $S(e)$, and $C(e)$ are indicators for "absent from
+either drug's individual side-effect list", "an EMA Important Medical
+Event", and "additionally life-threatening"; $A(e)$ indicates that a pair
+documenting $e$ also shares a protein target with a third regimen drug (the
+Tier-2 trigger of Table~3.2); and $I(e)$ is an inverse pair-frequency term,
+\begin{equation}
+  I(e) = \log\!\left(\frac{N}{\max(n_e,\,1)}\right),
+  \label{eq:idf}
+\end{equation}
+with $N$ the total number of distinct drug pairs documented in Decagon and
+$n_e$ the number of pairs documenting $e$, so that effects specific to a
+few pairs are weighted above ubiquitous ones. The six weights default to
+$w_r{=}1.0$, $w_i{=}0.5$, $w_m{=}1.0$, $w_s{=}2.0$, $w_c{=}2.0$, $w_a{=}1.0$,
+and are exposed through \texttt{Settings.ranking} so that they can be varied
+in an ablation. Ranked effects determine both the order in which documented
+effects are offered as evidence and, through $A(e)$, which pairs are
+eligible for a Tier-2 prediction.
+
+\subsection{Large Language Model Usage}
+\label{sec:llm-usage}
+
+Table~\ref{tab:llm} lists the request configuration. The LLM is accessed
+through OpenRouter's\footnote{\url{https://openrouter.ai}} OpenAI-compatible
+\texttt{/chat/completions} endpoint, which lets the model be swapped (via
+the \texttt{LLM\_MODEL} environment variable) without changing application
+code; the default model used in this project is Google's
+\texttt{gemini-2.5-flash}\footnote{\url{https://ai.google.dev/gemini-api/docs/models}}.
+The model is deliberately used as a constrained extraction-and-explanation
+layer over evidence the pipeline has already retrieved, ranked, and bounded
+(Section~\ref{sec:retrieval-impl}), rather than as an open-ended reasoner
+over the raw graph: the request asks for \texttt{json\_object} output and
+disables the model's own extended reasoning
+(\texttt{reasoning: \{"effort": "none", "exclude": true\}}), which reduces
+latency and cost without affecting prediction quality, since the biological
+reasoning -- which proteins are shared, which bridges exist, which pairs
+already have documented history -- is already encoded in the serialised
+evidence rather than left for the model to derive on its own.
+
+\begin{table}[t]
+  \caption{LLM request configuration}
+  \label{tab:llm}
+  \centering
+  \begin{tabular}{@{}ll@{}}
+    \toprule
+    Parameter & Value \\
+    \midrule
+    Endpoint         & OpenRouter, \texttt{/chat/completions} (OpenAI-compatible) \\
+    Default model    & \texttt{google/gemini-2.5-flash} (overridable via \texttt{LLM\_MODEL}) \\
+    \texttt{response\_format} & \texttt{json\_object} \\
+    \texttt{reasoning}        & \texttt{\{"effort": "none", "exclude": true\}} \\
+    \texttt{max\_tokens}      & 4000 \\
+    Timeout          & 120\,s (15\,s connect) \\
+    Retries          & up to 3, exponential back-off, on connection failure only \\
+    \bottomrule
+  \end{tabular}
+\end{table}
+
+The system prompt specifies the full output contract rather than leaving it
+to free text: a JSON object with a \texttt{predictions} array whose items
+carry \texttt{side\_effect}, \texttt{tier} ($1$--$3$), one or more
+\texttt{evidence\_ids}, and a Vietnamese, at-most-three-sentence
+\texttt{explanation} naming the drugs and, where relevant, the shared or
+bridging protein targets. The prompt restates the tier semantics of
+Table~3.2 as hard constraints on evidence use: a Tier-1 prediction must
+reproduce a documented pairwise effect; a Tier-2 prediction must reproduce a
+documented pairwise effect additionally supported by a target shared by at
+least three regimen drugs; a Tier-3 prediction is only a hypothesis,
+permitted solely when a retrieved bridge links the pair and that pair has
+no documented effect, and its \texttt{side\_effect} label must be copied
+verbatim from that bridge's \texttt{candidate\_side\_effects}. Output is
+capped at 15 predictions, prioritising Tier~1, then Tier~2, then at most two
+Tier-3 hypotheses, and the model is instructed to return an empty
+\texttt{predictions} array rather than invent evidence when support is
+insufficient.
+
+\subsection{Grounding, Validation, and Fallback Behaviour}
+\label{sec:grounding}
+
+The raw response is parsed with a strict \texttt{pydantic} schema
+(\texttt{ModelPrediction}/\texttt{PredictionList}); if that fails because
+the model wrapped the JSON in a fenced code block or stopped mid-stream, a
+tolerant recovery path scans the text with a streaming JSON decoder and
+keeps every complete, schema-valid object found before the cut-off, rather
+than discarding the whole response.
+
+Parsing success does not make a prediction trustworthy: every item is
+re-validated against the actually retrieved subgraph, independently of the
+model's own claims. A prediction is kept only if every cited
+\texttt{evidence\_id} exists, carries the declared tier, and (Tier~1/2)
+names the same side-effect label on every cited item, or (Tier~3) lists
+that label among the cited bridge's own candidates; the underlying graph
+edges of each cited path are additionally checked against the loaded
+target, PPI, and side-effect tables, and duplicate
+(tier, label, evidence-set) predictions are removed. A prediction failing
+any check is silently dropped rather than shown to the user. This two-stage
+check -- schema validation, then graph grounding -- is what allows Tier-2
+and Tier-3 output to be treated as traceable rather than as an unverified
+model claim.
+
+Because the LLM call can fail for several independent reasons (no API key
+configured, a malformed or non-conforming JSON body, an HTTP error from the
+provider, or a network failure), the pipeline treats all of them as a
+single degraded mode: \texttt{llm\_status} is set to \texttt{"fallback"}
+with a diagnostic message, and the request still returns the retrieved and
+ranked subgraph, interaction graph, and coverage summary without raising an
+exception, so a user still sees the underlying evidence even when no
+generated explanation is available.

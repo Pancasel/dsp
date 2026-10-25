@@ -41,10 +41,11 @@ def main() -> None:
         for case in cases:
             members = case["drugs"].split("|")
             base = [resolved[name] for name in members]
-            pair = tuple(sorted(resolved[name] for name in case["interacting_pair"].split("|")))
+            pair_ids = [resolved[name] for name in case["interacting_pair"].split("|")]
+            if None in base or None in pair_ids:
+                continue  # a drug of this case is not in Decagon
+            pair = tuple(sorted(pair_ids))
             pattern = re.compile(EXPECTED_EFFECTS[case["expected"]], re.IGNORECASE)
-            if None in base or None in pair:
-                continue
             for seed in (SEEDS if size > 3 else [0]):
                 rng = random.Random(f"{case['case']}-{size}-{seed}")
                 extra_pool = [resolved[n] for n in pool if n not in members and resolved[n]]

@@ -25,3 +25,34 @@ case,drugs,interacting_pair,expected,mechanism
 24,tramadol|fluoxetine|omeprazole,tramadol|fluoxetine,seizure_serotonin,serotonin syndrome and lowered seizure threshold (CYP2D6)
 25,sildenafil|isosorbide dinitrate|atorvastatin,sildenafil|isosorbide dinitrate,hypotension,PDE5 inhibitor + nitrate (contraindicated)
 26,haloperidol|citalopram|omeprazole,haloperidol|citalopram,arrhythmia,additive QT prolongation
+27,warfarin|metronidazole|amlodipine,warfarin|metronidazole,bleeding,metronidazole inhibits CYP2C9 and raises INR
+28,warfarin|amiodarone|metformin,warfarin|amiodarone,bleeding,amiodarone inhibits CYP2C9/3A4 and raises INR
+29,aspirin|ibuprofen|omeprazole,aspirin|ibuprofen,bleeding,additive GI mucosal injury and antiplatelet effect
+30,clopidogrel|naproxen|atorvastatin,clopidogrel|naproxen,bleeding,antiplatelet + NSAID
+31,enalapril|ibuprofen|furosemide,enalapril|ibuprofen,kidney,"""triple whammy"": NSAID + ACE inhibitor + loop diuretic"
+32,ramipril|naproxen|hydrochlorothiazide,ramipril|naproxen,kidney,"""triple whammy"": NSAID + ACE inhibitor + thiazide"
+33,losartan|potassium chloride|amlodipine,losartan|potassium chloride,hyperkalaemia,ARB + potassium supplement
+34,eplerenone|enalapril|atorvastatin,eplerenone|enalapril,hyperkalaemia,aldosterone antagonist + ACE inhibitor
+35,trimethoprim|enalapril|omeprazole,trimethoprim|enalapril,hyperkalaemia,trimethoprim blocks ENaC and adds to ACE inhibitor hyperkalaemia
+36,atenolol|diltiazem|omeprazole,atenolol|diltiazem,bradycardia,additive AV-node depression (non-DHP CCB + beta blocker)
+37,digoxin|verapamil|furosemide,digoxin|verapamil,bradycardia,verapamil raises digoxin levels and slows AV conduction
+38,lovastatin|erythromycin|omeprazole,lovastatin|erythromycin,rhabdomyolysis,CYP3A4 inhibition raises lovastatin exposure
+39,simvastatin|diltiazem|metformin,simvastatin|diltiazem,rhabdomyolysis,CYP3A4 inhibition raises simvastatin exposure
+40,simvastatin|gemfibrozil|metformin,simvastatin|gemfibrozil,rhabdomyolysis,fibrate + statin myopathy
+41,glimepiride|fluconazole|amlodipine,glimepiride|fluconazole,hypoglycaemia,fluconazole inhibits CYP2C9 metabolism of the sulfonylurea
+42,glibenclamide|clarithromycin|amlodipine,glibenclamide|clarithromycin,hypoglycaemia,macrolide raises sulfonylurea effect
+43,methotrexate|ibuprofen|omeprazole,methotrexate|ibuprofen,myelosuppression,NSAID reduces renal clearance of methotrexate
+44,azathioprine|allopurinol|prednisone,azathioprine|allopurinol,myelosuppression,xanthine oxidase inhibition raises azathioprine toxicity
+45,codeine|lorazepam|omeprazole,codeine|lorazepam,cns_respiratory_depression,opioid + benzodiazepine (FDA boxed warning)
+46,fentanyl|midazolam|omeprazole,fentanyl|midazolam,cns_respiratory_depression,opioid + benzodiazepine (FDA boxed warning)
+47,hydrocodone|clonazepam|acetaminophen,hydrocodone|clonazepam,cns_respiratory_depression,opioid + benzodiazepine (FDA boxed warning)
+48,linezolid|sertraline|omeprazole,linezolid|sertraline,seizure_serotonin,MAO inhibition + SSRI serotonin syndrome
+49,fluoxetine|sumatriptan|omeprazole,fluoxetine|sumatriptan,seizure_serotonin,SSRI + triptan serotonin syndrome
+50,bupropion|tramadol|omeprazole,bupropion|tramadol,seizure_serotonin,lowered seizure threshold (CYP2D6)
+51,sildenafil|nitroglycerin|atorvastatin,sildenafil|nitroglycerin,hypotension,PDE5 inhibitor + nitrate (contraindicated)
+52,tadalafil|isosorbide mononitrate|atorvastatin,tadalafil|isosorbide mononitrate,hypotension,PDE5 inhibitor + nitrate (contraindicated)
+53,amiodarone|sotalol|omeprazole,amiodarone|sotalol,arrhythmia,additive QT prolongation
+54,citalopram|ondansetron|omeprazole,citalopram|ondansetron,arrhythmia,additive QT prolongation
+55,erythromycin|haloperidol|omeprazole,erythromycin|haloperidol,arrhythmia,QT prolongation + CYP3A4 inhibition
+56,methadone|ciprofloxacin|omeprazole,methadone|ciprofloxacin,arrhythmia,additive QT prolongation
+57,quinidine|digoxin|furosemide,quinidine|digoxin,arrhythmia,quinidine raises digoxin levels (P-gp inhibition)

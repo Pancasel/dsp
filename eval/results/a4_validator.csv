@@ -1,7 +1,7 @@
 case,predictions,kept,rejected,expected,correct_rate
 valid,300,300,0,kept,1.0
-invented_id,277,0,277,rejected,1.0
-invented_label,73,0,73,rejected,1.0
-label_not_candidate,73,0,73,rejected,1.0
-wrong_label,227,0,227,rejected,1.0
+invented_id,235,0,235,rejected,1.0
+invented_label,115,0,115,rejected,1.0
+label_not_candidate,115,0,115,rejected,1.0
+wrong_label,185,0,185,rejected,1.0
 wrong_tier,300,0,300,rejected,1.0

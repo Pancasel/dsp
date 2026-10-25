@@ -25,3 +25,32 @@ case,drugs,expected,pair_documented,Chỉ từ khóa|rank,IME|rank,IME + đe d�
 24,tramadol|fluoxetine|omeprazole,seizure_serotonin,1,19,82,25,15
 25,sildenafil|isosorbide dinitrate|atorvastatin,hypotension,1,,,,
 26,haloperidol|citalopram|omeprazole,arrhythmia,1,2,15,3,3
+27,warfarin|metronidazole|amlodipine,bleeding,1,2,10,3,6
+28,warfarin|amiodarone|metformin,bleeding,1,4,15,6,14
+29,aspirin|ibuprofen|omeprazole,bleeding,1,1,1,1,4
+30,clopidogrel|naproxen|atorvastatin,bleeding,1,3,5,3,7
+31,enalapril|ibuprofen|furosemide,kidney,1,6,12,6,3
+32,ramipril|naproxen|hydrochlorothiazide,kidney,1,,68,82,52
+33,losartan|potassium chloride|amlodipine,hyperkalaemia,0,,,,
+34,eplerenone|enalapril|atorvastatin,hyperkalaemia,0,,,,
+35,trimethoprim|enalapril|omeprazole,hyperkalaemia,1,,57,15,16
+36,atenolol|diltiazem|omeprazole,bradycardia,1,10,7,13,9
+37,digoxin|verapamil|furosemide,bradycardia,1,8,16,9,1
+38,lovastatin|erythromycin|omeprazole,rhabdomyolysis,1,22,9,22,31
+39,simvastatin|diltiazem|metformin,rhabdomyolysis,1,23,33,31,41
+40,simvastatin|gemfibrozil|metformin,rhabdomyolysis,1,3,13,3,8
+41,glimepiride|fluconazole|amlodipine,hypoglycaemia,0,22,61,29,27
+42,glibenclamide|clarithromycin|amlodipine,hypoglycaemia,1,5,9,6,7
+43,methotrexate|ibuprofen|omeprazole,myelosuppression,1,,8,29,9
+44,azathioprine|allopurinol|prednisone,myelosuppression,1,7,1,2,5
+46,fentanyl|midazolam|omeprazole,cns_respiratory_depression,1,24,10,7,8
+48,linezolid|sertraline|omeprazole,seizure_serotonin,1,3,21,4,5
+49,fluoxetine|sumatriptan|omeprazole,seizure_serotonin,0,,,,
+50,bupropion|tramadol|omeprazole,seizure_serotonin,1,8,24,8,42
+51,sildenafil|nitroglycerin|atorvastatin,hypotension,1,,59,64,53
+52,tadalafil|isosorbide mononitrate|atorvastatin,hypotension,0,,2,15,14
+53,amiodarone|sotalol|omeprazole,arrhythmia,1,2,3,1,1
+54,citalopram|ondansetron|omeprazole,arrhythmia,1,24,28,5,7
+55,erythromycin|haloperidol|omeprazole,arrhythmia,1,2,6,3,1
+56,methadone|ciprofloxacin|omeprazole,arrhythmia,1,20,59,22,11
+57,quinidine|digoxin|furosemide,arrhythmia,0,19,51,19,11

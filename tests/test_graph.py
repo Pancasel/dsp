@@ -287,3 +287,79 @@ def test_combo_only_drug_keeps_pairwise_history(graph: DecagonGraph) -> None:
         for item in evidence
     )
     assert not any(item.tier == 3 and "D4" in item.drug_pair for item in evidence)
+
+
+def test_degree_percentile_threshold():
+    from graphrag.dataset import degree_percentile_threshold
+
+    ppi = {f"P{i}": {f"N{j}" for j in range(i)} for i in range(1, 101)}
+    assert degree_percentile_threshold(ppi, 50) == 51
+    assert degree_percentile_threshold(ppi, 100) == 100
+    assert degree_percentile_threshold({}, 90) == 0
+
+
+def test_rejections_are_reported_with_reason(graph):
+    rejections: list[dict[str, str]] = []
+    accepted = validate_predictions(
+        [ModelPrediction(side_effect="x", tier=1, evidence_ids=["E999"], explanation="n/a")],
+        [],
+        graph,
+        rejections,
+    )
+    assert accepted == []
+    assert rejections == [{"side_effect": "x", "tier": "1", "reason": "unknown_evidence"}]
+
+
+def test_convergence_targets_use_one_hop_neighbourhood_without_hubs(graph):
+    graph.hub_degree_threshold = 3
+    targets_by_drug = {"D1": {"G1"}, "D2": {"MID"}, "D3": {"LOW"}}
+
+    assert graph.convergence_targets(targets_by_drug) == {"G1": ["D1", "D2", "D3"]}
+    # G1 is reached by D2 and D3 only through neighbours; HUB (degree 4) is skipped.
+    assert "HUB" not in graph.convergence_targets(targets_by_drug)
+
+
+def test_convergence_amplification_adds_validated_tier2_paths(graph):
+    graph.hub_degree_threshold = 3
+    graph.targets = {"D1": {"G1"}, "D2": {"MID"}, "D3": {"LOW"}}
+    graph.convergence_amplification = False
+    _, evidence = graph.retrieve(["D1", "D2", "D3"])
+    assert not any(item.tier == 2 for item in evidence)
+
+    graph.convergence_amplification = True
+    context, evidence = graph.retrieve(["D1", "D2", "D3"])
+    tier2 = [item for item in evidence if item.tier == 2]
+    assert tier2 and all(graph.validate_evidence(item) for item in tier2)
+    assert any(edge["relation"] == "interacts_with" for edge in tier2[0].path)
+    assert any(item["amplified"] for item in context["ranked_effects"])
+
+
+def test_tier1_cannot_use_up_the_budget_reserved_for_tier2_and_tier3(graph):
+    from graphrag.dataset import _Candidate
+
+    def group(tier, pair, count):
+        return [
+            _Candidate(tier=tier, kind="k", drug_pair=pair, path=(), effect=None)
+            for _ in range(count)
+        ]
+
+    graph.max_evidence = 8
+    evidence, truncated = graph._select_evidence(
+        ([group(1, ("D1", "D2"), 20)], [group(2, ("D1", "D2"), 20)], [group(3, ("D1", "D3"), 1)]),
+        ["D1", "D2", "D3"],
+        set(),
+    )
+    tiers = [item.tier for item in evidence]
+    # Tier 3 uses one of its two reserved slots; the spare one goes to Tier 1.
+    assert (tiers.count(1), tiers.count(2), tiers.count(3)) == (5, 2, 1)
+    assert truncated
+
+
+def test_focus_limits_keep_only_shown_effects_as_documented_evidence(graph):
+    _, all_evidence = graph.retrieve(["D1", "D2", "D3"])
+    _, focused = graph.retrieve(["D1", "D2", "D3"], focus_limits=(0, 0))
+    assert any(item.tier == 1 for item in all_evidence)
+    assert not any(item.tier in (1, 2) for item in focused)
+    assert {item.drug_pair for item in focused if item.tier == 3} == {
+        item.drug_pair for item in all_evidence if item.tier == 3
+    }

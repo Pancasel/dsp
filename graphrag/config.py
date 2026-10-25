@@ -39,6 +39,13 @@ def _float(name: str, default: str) -> float:
         raise ValueError(f"{name} must be a number") from exc
 
 
+def _percentile(name: str) -> float:
+    value = _float(name, "0")
+    if not 0 <= value <= 100:
+        raise ValueError(f"{name} must be between 0 and 100")
+    return value
+
+
 @dataclass(frozen=True)
 class RankingWeights:
     """Weights of the regimen-level side-effect score (see app/ranking.py)."""
@@ -76,6 +83,12 @@ class Settings:
     max_serious_effects: int = 10
     max_other_effects: int = 5
     tier3_candidates_per_pair: int = 20
+    # 0 keeps the absolute hub_degree_threshold; otherwise the threshold is
+    # that percentile (0-100) of the PPI degree distribution.
+    hub_degree_percentile: float = 0.0
+    # Count proteins within one PPI hop of >= 3 drugs' targets as Tier 2
+    # amplification, not only proteins all three target directly.
+    convergence_amplification: bool = False
     ranking: RankingWeights = RankingWeights()
 
     @classmethod
@@ -133,6 +146,10 @@ class Settings:
             tier3_candidates_per_pair=_bounded_int(
                 "TIER3_CANDIDATES_PER_PAIR", "20", minimum=1
             ),
+            hub_degree_percentile=_percentile("HUB_DEGREE_PERCENTILE"),
+            convergence_amplification=os.environ.get(
+                "CONVERGENCE_AMPLIFICATION", "0"
+            ).strip().lower() in {"1", "true", "yes"},
             ranking=RankingWeights(
                 recurrence=_float("RANK_W_RECURRENCE", "1.0"),
                 idf=_float("RANK_W_IDF", "0.5"),

@@ -35,9 +35,9 @@ Sinh tự động bởi `python eval/run_offline.py` và `python eval/run_accura
 | Tier 1 – recall: tác dụng phụ trong CSV của các cặp được trả về | 52880 | 52880 | 100.0% |
 | Tier 2 – precision: cặp gắn Tier 2 thỏa quy tắc protein chung | 72 | 72 | 100.0% |
 | Tier 2 – recall: cặp thỏa quy tắc được gắn Tier 2 | 72 | 72 | 100.0% |
-| Tier 1 – đường dẫn bằng chứng đúng từng cạnh | 36145 | 36145 | 100.0% |
-| Tier 2 – đường dẫn bằng chứng đúng từng cạnh | 1203 | 1203 | 100.0% |
-| Tier 3 – đường dẫn bằng chứng đúng từng cạnh | 3181 | 3181 | 100.0% |
+| Tier 1 – đường dẫn bằng chứng đúng từng cạnh | 33479 | 33479 | 100.0% |
+| Tier 2 – đường dẫn bằng chứng đúng từng cạnh | 2504 | 2504 | 100.0% |
+| Tier 3 – đường dẫn bằng chứng đúng từng cạnh | 4546 | 4546 | 100.0% |
 
 ## A2. Dự đoán cặp thuốc có tương tác từ đồ thị protein
 
@@ -93,22 +93,22 @@ Dự đoán hợp lệ và dự đoán bị làm sai có chủ đích (ID bằng
 | Trường hợp | Số dự đoán | Mong đợi | Giữ | Loại | Đúng |
 |---|---|---|---|---|---|
 | Hợp lệ | 300 | giữ | 300 | 0 | 100.0% |
-| ID bằng chứng bịa | 277 | loại | 0 | 277 | 100.0% |
-| Nhãn bịa (ngoài từ vựng) | 73 | loại | 0 | 73 | 100.0% |
-| Nhãn Tier 3 ngoài ứng viên | 73 | loại | 0 | 73 | 100.0% |
-| Sai nhãn tác dụng phụ | 227 | loại | 0 | 227 | 100.0% |
+| ID bằng chứng bịa | 235 | loại | 0 | 235 | 100.0% |
+| Nhãn bịa (ngoài từ vựng) | 115 | loại | 0 | 115 | 100.0% |
+| Nhãn Tier 3 ngoài ứng viên | 115 | loại | 0 | 115 | 100.0% |
+| Sai nhãn tác dụng phụ | 185 | loại | 0 | 185 | 100.0% |
 | Sai tier | 300 | loại | 0 | 300 | 100.0% |
 
 ## A5. Benchmark tương tác thuốc kinh điển
 
-26 ca tương tác đã được xác lập lâm sàng (`eval/clinical_benchmark.csv`), mỗi ca gồm cặp tương tác và một thuốc thứ ba. Đo vị trí tác dụng phụ mong đợi trong danh sách nghiêm trọng (hệ thống hiển thị 10 mục đầu).
+55 ca tương tác phổ biến trong nhãn thuốc và tài liệu dược lý (`eval/clinical_benchmark.csv`), mỗi ca gồm cặp tương tác và một thuốc thứ ba. Đo vị trí tác dụng phụ mong đợi trong danh sách nghiêm trọng (hệ thống hiển thị 10 mục đầu). Lưu ý: danh sách ca do AI tổng hợp từ kiến thức dược lý công khai và **chưa được bác sĩ/dược sĩ duyệt**; ca 27 trở đi được thêm sau để kiểm tra kết quả không phụ thuộc vào 26 ca đầu.
 
 | Cách xếp hạng | Ca có dữ liệu | Hit@3 | Hit@10 | MRR |
 |---|---|---|---|---|
-| Chỉ từ khóa | 26 | 30.8% | 53.8% | 0.241 |
-| IME | 26 | 15.4% | 42.3% | 0.1566 |
-| IME + đe dọa tính mạng (mặc định) | 26 | 23.1% | 53.8% | 0.2219 |
-| IME + đe dọa tính mạng, bỏ IDF | 26 | 15.4% | 50.0% | 0.1769 |
+| Chỉ từ khóa | 52 | 28.8% | 53.8% | 0.2153 |
+| IME | 52 | 15.4% | 44.2% | 0.1636 |
+| IME + đe dọa tính mạng (mặc định) | 52 | 25.0% | 55.8% | 0.2195 |
+| IME + đe dọa tính mạng, bỏ IDF | 52 | 15.4% | 53.8% | 0.196 |
 
 ![A5](figures/a5_clinical_benchmark.png)
 
@@ -140,6 +140,35 @@ Dự đoán hợp lệ và dự đoán bị làm sai có chủ đích (ID bằng
 | 24 | tramadol + fluoxetine + omeprazole | co giật / serotonin | 25 |
 | 25 | sildenafil + isosorbide dinitrate + atorvastatin | tụt huyết áp | không nằm trong nhóm nghiêm trọng |
 | 26 | haloperidol + citalopram + omeprazole | loạn nhịp | 3 |
+| 27 | warfarin + metronidazole + amlodipine | chảy máu | 3 |
+| 28 | warfarin + amiodarone + metformin | chảy máu | 6 |
+| 29 | aspirin + ibuprofen + omeprazole | chảy máu | 1 |
+| 30 | clopidogrel + naproxen + atorvastatin | chảy máu | 3 |
+| 31 | enalapril + ibuprofen + furosemide | suy thận | 6 |
+| 32 | ramipril + naproxen + hydrochlorothiazide | suy thận | 82 |
+| 33 | losartan + potassium chloride + amlodipine | tăng kali máu | không nằm trong nhóm nghiêm trọng |
+| 34 | eplerenone + enalapril + atorvastatin | tăng kali máu | không nằm trong nhóm nghiêm trọng |
+| 35 | trimethoprim + enalapril + omeprazole | tăng kali máu | 15 |
+| 36 | atenolol + diltiazem + omeprazole | nhịp chậm / block tim | 13 |
+| 37 | digoxin + verapamil + furosemide | nhịp chậm / block tim | 9 |
+| 38 | lovastatin + erythromycin + omeprazole | tiêu cơ vân | 22 |
+| 39 | simvastatin + diltiazem + metformin | tiêu cơ vân | 31 |
+| 40 | simvastatin + gemfibrozil + metformin | tiêu cơ vân | 3 |
+| 41 | glimepiride + fluconazole + amlodipine | hạ đường huyết | 29 |
+| 42 | glibenclamide + clarithromycin + amlodipine | hạ đường huyết | 6 |
+| 43 | methotrexate + ibuprofen + omeprazole | ức chế tủy | 29 |
+| 44 | azathioprine + allopurinol + prednisone | ức chế tủy | 2 |
+| 46 | fentanyl + midazolam + omeprazole | ức chế thần kinh / hô hấp | 7 |
+| 48 | linezolid + sertraline + omeprazole | co giật / serotonin | 4 |
+| 49 | fluoxetine + sumatriptan + omeprazole | co giật / serotonin | không nằm trong nhóm nghiêm trọng |
+| 50 | bupropion + tramadol + omeprazole | co giật / serotonin | 8 |
+| 51 | sildenafil + nitroglycerin + atorvastatin | tụt huyết áp | 64 |
+| 52 | tadalafil + isosorbide mononitrate + atorvastatin | tụt huyết áp | 15 |
+| 53 | amiodarone + sotalol + omeprazole | loạn nhịp | 1 |
+| 54 | citalopram + ondansetron + omeprazole | loạn nhịp | 5 |
+| 55 | erythromycin + haloperidol + omeprazole | loạn nhịp | 3 |
+| 56 | methadone + ciprofloxacin + omeprazole | loạn nhịp | 22 |
+| 57 | quinidine + digoxin + furosemide | loạn nhịp | 19 |
 
 **Diễn giải.** Decagon chỉ cho biết một tác dụng phụ *có* được báo cáo cho cặp thuốc hay không, không có tần suất hay mức độ, nên điểm xếp hạng không phân biệt được tác dụng phụ đặc trưng của tương tác với hàng trăm tác dụng phụ khác của cùng cặp. Khoảng một nửa số ca kinh điển lên được top 10. Thử thêm chuẩn hoá theo độ đặc trưng của thuốc (kiểu PRR) cũng không cải thiện ổn định, nên trọng số không được chỉnh theo bộ 26 ca này để tránh overfit. Hướng cải thiện: dùng số lượng báo cáo FAERS để tính disproportionality thật.
 
@@ -156,4 +185,4 @@ Chuẩn tham chiếu: danh sách *Important Medical Event* (IME) của EMA, MedD
 
 ## E3. Dự đoán của LLM qua được validator
 
-Chưa chạy (cần gọi API): `python eval/e3_llm_groundedness.py --yes-call-api --regimens 10`.
+10 phác đồ: giữ 90/103 dự đoán (87.4%).

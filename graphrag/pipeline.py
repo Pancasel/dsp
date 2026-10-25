@@ -64,6 +64,8 @@ class PolypharmacySystem:
             max_evidence=settings.max_evidence,
             mono_file=mono,
             tier3_candidates_per_pair=settings.tier3_candidates_per_pair,
+            hub_degree_percentile=settings.hub_degree_percentile,
+            convergence_amplification=settings.convergence_amplification,
         )
         names = NameIndex.load(
             settings.drug_names_file,
@@ -112,15 +114,20 @@ class PolypharmacySystem:
         drugs, sources = self.resolve_regimen(inputs)
         limits = (self.settings.max_serious_effects, self.settings.max_other_effects)
         graph_context, evidence = self.graph.retrieve(
-            drugs, self.names.is_serious, self.settings.ranking, self.names.is_critical
+            drugs,
+            self.names.is_serious,
+            self.settings.ranking,
+            self.names.is_critical,
+            focus_limits=limits,
         )
         llm_context = build_llm_context(drugs, graph_context, evidence, self.names, *limits)
 
         llm_status, llm_error = "ok", None
         validated: list[dict[str, object]] = []
+        rejected: list[dict[str, str]] = []
         try:
             raw = generate_predictions(self.settings, drugs, llm_context)
-            validated = validate_predictions(raw, evidence, self.graph)
+            validated = validate_predictions(raw, evidence, self.graph, rejected)
         except (LLMConfigurationError, LLMResponseError) as exc:
             llm_status, llm_error = "fallback", str(exc)
         except httpx.HTTPStatusError as exc:
@@ -159,6 +166,7 @@ class PolypharmacySystem:
                 "max_serious_effects": limits[0],
                 "max_other_effects": limits[1],
                 "max_evidence": self.settings.max_evidence,
-                "hub_degree_threshold": self.settings.hub_degree_threshold,
+                "hub_degree_threshold": self.graph.hub_degree_threshold,
+                "rejected_predictions": rejected,
             },
         }

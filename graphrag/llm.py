@@ -203,63 +203,102 @@ def generate_predictions(
         raise error from exc
 
 
+def _verify_prediction(
+    prediction: ModelPrediction,
+    tier: int,
+    evidence_ids: list[str],
+    evidence_by_id: dict[str, Evidence],
+    graph: DecagonGraph,
+) -> tuple[list[Evidence], str, str]:
+    """Check one claim at ``tier``; returns (evidence, label, rejection reason)."""
+    ordered_ids: list[str] = []
+    for evidence_id in evidence_ids:
+        item = evidence_by_id.get(evidence_id)
+        if item is None:
+            return [], "", "unknown_evidence"
+        if item.tier != tier:
+            return [], "", "tier_mismatch"
+        if not graph.validate_evidence(item):
+            return [], "", "invalid_path"
+        if evidence_id not in ordered_ids:
+            ordered_ids.append(evidence_id)
+    if not ordered_ids:
+        return [], "", "no_evidence"
+    selected = [evidence_by_id[evidence_id] for evidence_id in ordered_ids]
+    label = prediction.side_effect.casefold().strip()
+    if tier in (1, 2):
+        if any((item.side_effect or "").casefold().strip() != label for item in selected):
+            return [], "", "label_mismatch"
+        return selected, selected[0].side_effect or "", ""
+    canonical = graph.side_effect_names.get(label)
+    if canonical is None:
+        return [], "", "unknown_label"
+    # Every cited bridge must list the label among its candidates; a bridge
+    # without candidates supports no label at all.
+    if any(
+        label not in {name.casefold() for name in item.candidates} for item in selected
+    ):
+        return [], "", "label_not_candidate"
+    return selected, canonical, ""
+
+
 def validate_predictions(
     predictions: list[ModelPrediction],
     evidence_items: list[Evidence],
     graph: DecagonGraph,
+    rejections: list[dict[str, str]] | None = None,
 ) -> list[dict[str, object]]:
+    """Keep only claims whose cited evidence re-checks against the raw data.
+
+    A failed tier 2 claim is downgraded to tier 1 when the evidence it cited
+    includes documented tier 1 items for the same label; nothing new is added.
+    Claims that survive at no tier are appended to ``rejections`` (tier 0).
+    """
     evidence_by_id = {item.evidence_id: item for item in evidence_items}
     validated: list[dict[str, object]] = []
     seen: set[tuple[int, str, tuple[str, ...]]] = set()
     for prediction in predictions:
-        ordered_ids: list[str] = []
-        invalid = False
-        for evidence_id in prediction.evidence_ids:
-            item = evidence_by_id.get(evidence_id)
-            if (
-                item is None
-                or item.tier != prediction.tier
-                or not graph.validate_evidence(item)
-            ):
-                invalid = True
-                break
-            if evidence_id not in ordered_ids:
-                ordered_ids.append(evidence_id)
-        if invalid or not ordered_ids:
+        tier = prediction.tier
+        selected, side_effect, reason = _verify_prediction(
+            prediction, tier, prediction.evidence_ids, evidence_by_id, graph
+        )
+        downgraded_from = None
+        if reason and tier == 2:
+            lower_ids = [
+                evidence_id
+                for evidence_id in prediction.evidence_ids
+                if evidence_id in evidence_by_id and evidence_by_id[evidence_id].tier == 1
+            ]
+            if lower_ids:
+                selected, side_effect, lower_reason = _verify_prediction(
+                    prediction, 1, lower_ids, evidence_by_id, graph
+                )
+                if not lower_reason:
+                    downgraded_from, tier, reason = 2, 1, ""
+        if reason:
+            if rejections is not None:
+                rejections.append(
+                    {
+                        "side_effect": prediction.side_effect,
+                        "tier": str(prediction.tier),
+                        "reason": reason,
+                    }
+                )
             continue
-        selected = [evidence_by_id[evidence_id] for evidence_id in ordered_ids]
-        label = prediction.side_effect.casefold().strip()
-        if prediction.tier in (1, 2):
-            if any(
-                (item.side_effect or "").casefold().strip() != label for item in selected
-            ):
-                continue
-            side_effect = selected[0].side_effect or ""
-        else:
-            canonical = graph.side_effect_names.get(label)
-            if canonical is None:
-                continue
-            # Every cited bridge must list the label among its candidates; a
-            # bridge without candidates supports no label at all.
-            if any(
-                label not in {name.casefold() for name in item.candidates}
-                for item in selected
-            ):
-                continue
-            side_effect = canonical
 
         evidence_key = tuple(sorted(item.evidence_id for item in selected))
-        dedupe_key = (prediction.tier, side_effect.casefold(), evidence_key)
+        dedupe_key = (tier, side_effect.casefold(), evidence_key)
         if dedupe_key in seen:
             continue
         seen.add(dedupe_key)
-        validated.append(
-            {
-                "side_effect": side_effect,
-                "tier": prediction.tier,
-                "hypothesis": prediction.tier == 3,
-                "explanation": prediction.explanation.strip(),
-                "evidence": [item.to_dict() for item in selected],
-            }
-        )
+        result: dict[str, object] = {
+            "side_effect": side_effect,
+            "tier": tier,
+            "hypothesis": tier == 3,
+            "explanation": prediction.explanation.strip(),
+            "evidence": [item.to_dict() for item in selected],
+        }
+        if downgraded_from is not None:
+            result["downgraded_from"] = downgraded_from
+        validated.append(result)
     return validated
