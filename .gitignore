@@ -9,3 +9,7 @@ data/
 report_src/node_modules/
 report_src/package-lock.json
 report_src/fonts/
+
+# Built report files
+*.pdf
+*.docx
