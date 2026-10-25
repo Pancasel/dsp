@@ -233,6 +233,15 @@ def _cache_is_current(source: Path, database: Path, mono: Path | None = None) ->
     return row is not None and row[0] == _cache_signature(source, mono)
 
 
+def degree_percentile_threshold(ppi: dict[str, set[str]], percentile: float) -> int:
+    """Degree at or below which a protein is not treated as a hub."""
+    degrees = sorted(len(neighbors) for neighbors in ppi.values())
+    if not degrees:
+        return 0
+    index = min(len(degrees) - 1, int(len(degrees) * percentile / 100))
+    return degrees[index]
+
+
 def _take_round_robin(
     groups: list[list[_Candidate]], limit: int
 ) -> tuple[list[_Candidate], bool]:
@@ -273,6 +282,7 @@ class DecagonGraph:
         effect_pair_count: dict[str, int] | None = None,
         total_pairs: int = 0,
         tier3_candidates_per_pair: int = 20,
+        convergence_amplification: bool = False,
     ) -> None:
         self.targets = targets
         self.ppi = ppi
@@ -286,6 +296,7 @@ class DecagonGraph:
         self.effect_pair_count = effect_pair_count or {}
         self.total_pairs = total_pairs
         self.tier3_candidates_per_pair = tier3_candidates_per_pair
+        self.convergence_amplification = convergence_amplification
         self._mono_cache: dict[str, list[SideEffect]] = {}
         self._drug_effect_cache: dict[str, dict[str, tuple[str, int]]] = {}
 
@@ -302,6 +313,8 @@ class DecagonGraph:
         max_evidence: int = 400,
         mono_file: Path | None = None,
         tier3_candidates_per_pair: int = 20,
+        hub_degree_percentile: float = 0.0,
+        convergence_amplification: bool = False,
     ) -> "DecagonGraph":
         targets: dict[str, set[str]] = {}
         for row in _rows(targets_file, ("STITCH", "Gene")):
@@ -316,6 +329,11 @@ class DecagonGraph:
             if gene_a and gene_b and gene_a != gene_b:
                 ppi.setdefault(gene_a, set()).add(gene_b)
                 ppi.setdefault(gene_b, set()).add(gene_a)
+
+        if hub_degree_percentile > 0:
+            hub_degree_threshold = degree_percentile_threshold(
+                ppi, hub_degree_percentile
+            )
 
         if not _cache_is_current(combo_file, combo_db, mono_file):
             _build_combo_cache(combo_file, combo_db, mono_file)
@@ -360,6 +378,7 @@ class DecagonGraph:
             effect_pair_count,
             stats[0] if stats else 0,
             tier3_candidates_per_pair,
+            convergence_amplification,
         )
 
     def mono_effects(self, drug: str) -> list[SideEffect]:
@@ -585,6 +604,29 @@ class DecagonGraph:
                 shared[protein] = owners
         return shared
 
+    def convergence_targets(
+        self, targets_by_drug: dict[str, set[str]]
+    ) -> dict[str, list[str]]:
+        """Proteins within one PPI hop of the targets of at least three drugs.
+
+        Direct targets always count; hub neighbours (degree above the
+        threshold) are not expanded into. Only proteins that are not already
+        a direct shared target are returned, mapped to their sorted drugs.
+        """
+        reached: dict[str, set[str]] = {}
+        for drug, drug_targets in targets_by_drug.items():
+            for protein in drug_targets:
+                reached.setdefault(protein, set()).add(drug)
+                for neighbor in self._sorted_neighbors(protein):
+                    if self._expandable(neighbor):
+                        reached.setdefault(neighbor, set()).add(drug)
+        direct = self._shared_targets(targets_by_drug)
+        return {
+            protein: sorted(owners)
+            for protein, owners in reached.items()
+            if len(owners) >= 3 and protein not in direct
+        }
+
     @staticmethod
     def _proteins_by_pair(shared_targets: dict[str, list[str]]) -> dict[tuple[str, str], list[str]]:
         by_pair: dict[tuple[str, str], list[str]] = {}
@@ -621,8 +663,22 @@ class DecagonGraph:
             pair_effects[pair].sort(key=lambda effect: rank_of.get(effect.code, len(rank_of)))
         return ranked
 
-    @staticmethod
+    def _reach_path(self, drug: str, protein: str) -> list[dict[str, str]]:
+        """Edges from a drug to a protein it targets directly or through one PPI hop."""
+        if protein in self.targets.get(drug, set()):
+            return [{"source": drug, "relation": "targets", "target": protein}]
+        via = next(
+            target
+            for target in sorted(self.targets.get(drug, set()))
+            if protein in self.ppi.get(target, set())
+        )
+        return [
+            {"source": drug, "relation": "targets", "target": via},
+            {"source": via, "relation": "interacts_with", "target": protein},
+        ]
+
     def _documented_candidates(
+        self,
         pair: tuple[str, str],
         effects: list[SideEffect],
         shared_proteins: list[str],
@@ -650,9 +706,10 @@ class DecagonGraph:
         tier2: list[_Candidate] = []
         if shared_proteins:
             targets_path = [
-                {"source": drug, "relation": "targets", "target": protein}
+                edge
                 for protein in shared_proteins
                 for drug in (drug_a, drug_b)
+                for edge in self._reach_path(drug, protein)
             ]
             tier2 = [
                 _Candidate(
@@ -718,6 +775,7 @@ class DecagonGraph:
         proteins_by_pair: dict[tuple[str, str], list[str]],
         targets_by_drug: dict[str, set[str]],
         regimen_targets: set[str],
+        focus_codes: set[str] | None = None,
     ):
         """Per-pair candidate groups for each tier, the pruned hubs and a truncation flag."""
         tier1_groups: list[list[_Candidate]] = []
@@ -734,8 +792,12 @@ class DecagonGraph:
                 if len(shared_proteins) > MAX_SHARED_PROTEINS_IN_PATH:
                     truncated = True
                     shared_proteins = shared_proteins[:MAX_SHARED_PROTEINS_IN_PATH]
+                if focus_codes is not None:
+                    # Only effects that will be shown need citable evidence.
+                    effects = [effect for effect in effects if effect.code in focus_codes]
                 tier1, tier2 = self._documented_candidates(pair, effects, shared_proteins)
-                tier1_groups.append(tier1)
+                if tier1:
+                    tier1_groups.append(tier1)
                 if tier2:
                     tier2_groups.append(tier2)
                 continue
@@ -758,20 +820,35 @@ class DecagonGraph:
         regimen_targets: set[str],
     ) -> tuple[list[Evidence], bool]:
         """Spread the evidence budget over pairs, tier by tier, and number the items E1, E2, ..."""
-        tier1_groups, tier2_groups, tier3_groups = groups
-        selected_tier1, tier1_truncated = _take_round_robin(tier1_groups, self.max_evidence)
-        selected_tier2, tier2_truncated = _take_round_robin(
-            tier2_groups, self.max_evidence - len(selected_tier1)
+        # Drop paths through pruned hubs before spending the budget on them.
+        tier1_groups, tier2_groups, tier3_groups = (
+            [
+                kept
+                for group in tier_groups
+                if (
+                    kept := [
+                        item
+                        for item in group
+                        if self._path_is_kept(item.path, drugs, regimen_targets)
+                    ]
+                )
+            ]
+            for tier_groups in groups
         )
-        selected_tier3, tier3_truncated = _take_round_robin(
-            tier3_groups,
-            self.max_evidence - len(selected_tier1) - len(selected_tier2),
+        # Tier 2 and Tier 3 each get a reserved quarter of the budget so that
+        # Tier 1 cannot crowd them out; whatever a tier leaves unused goes to
+        # Tier 1 first, then back to Tier 2 and Tier 3.
+        reserve = self.max_evidence // 4
+        selected_tier2, _ = _take_round_robin(tier2_groups, reserve)
+        selected_tier3, _ = _take_round_robin(tier3_groups, reserve)
+        selected_tier1, tier1_truncated = _take_round_robin(
+            tier1_groups, self.max_evidence - len(selected_tier2) - len(selected_tier3)
         )
-        selected = [
-            item
-            for item in selected_tier1 + selected_tier2 + selected_tier3
-            if self._path_is_kept(item.path, drugs, regimen_targets)
-        ]
+        spare = self.max_evidence - len(selected_tier1) - len(selected_tier3)
+        selected_tier2, tier2_truncated = _take_round_robin(tier2_groups, spare)
+        spare = self.max_evidence - len(selected_tier1) - len(selected_tier2)
+        selected_tier3, tier3_truncated = _take_round_robin(tier3_groups, spare)
+        selected = selected_tier1 + selected_tier2 + selected_tier3
         evidence = [
             Evidence(
                 evidence_id=f"E{index}",
@@ -793,20 +870,45 @@ class DecagonGraph:
         is_serious: Callable[[str], bool] | None = None,
         weights: RankingWeights | None = None,
         is_critical: Callable[[str], bool] | None = None,
+        focus_limits: tuple[int, int] | None = None,
     ) -> tuple[dict[str, object], list[Evidence]]:
+        """Subgraph and numbered evidence for a regimen.
+
+        focus_limits=(max_serious, max_other) restricts documented evidence to
+        the effects that will be shown (the top serious and other effects by
+        score), leaving the evidence budget for Tier 2 and Tier 3.
+        """
         targets_by_drug = {drug: self.targets.get(drug, set()) for drug in drugs}
         regimen_targets = set().union(*targets_by_drug.values()) if drugs else set()
         shared_targets = self._shared_targets(targets_by_drug)
+        convergence = self.convergence_targets(targets_by_drug)
+        amplifying = (
+            {**shared_targets, **convergence}
+            if self.convergence_amplification
+            else shared_targets
+        )
 
         pairs = list(itertools.combinations(sorted(drugs), 2))
         pair_effects = self._pair_side_effects(pairs)
-        proteins_by_pair = self._proteins_by_pair(shared_targets)
+        proteins_by_pair = self._proteins_by_pair(amplifying)
         ranked = self._rank_pair_effects(
             pairs, pair_effects, proteins_by_pair, is_serious, weights, is_critical
         )
 
+        focus_codes = None
+        if focus_limits is not None:
+            max_serious, max_other = focus_limits
+            # Same choice as presenter.select_effects.
+            focus_codes = {
+                item.code for item in [e for e in ranked if e.serious][:max_serious]
+            } | {item.code for item in [e for e in ranked if not e.serious][:max_other]}
         tier1, tier2, tier3, pruned_hubs, truncated = self._collect_candidates(
-            pairs, pair_effects, proteins_by_pair, targets_by_drug, regimen_targets
+            pairs,
+            pair_effects,
+            proteins_by_pair,
+            targets_by_drug,
+            regimen_targets,
+            focus_codes,
         )
         evidence, selection_truncated = self._select_evidence(
             (tier1, tier2, tier3), drugs, regimen_targets
@@ -839,6 +941,10 @@ class DecagonGraph:
             "shared_targets": [
                 {"protein": protein, "drugs": owners}
                 for protein, owners in sorted(shared_targets.items())
+            ],
+            "convergence_targets": [
+                {"protein": protein, "drugs": owners}
+                for protein, owners in sorted(convergence.items())
             ],
             "ranked_effects": [item.to_dict() for item in ranked],
             "pairs_with_documented_effects": [

@@ -3,6 +3,6 @@ Tier 1 – precision: tác dụng phụ trả về có trong combo CSV,52880,528
 Tier 1 – recall: tác dụng phụ trong CSV của các cặp được trả về,52880,52880,1.0
 Tier 2 – precision: cặp gắn Tier 2 thỏa quy tắc protein chung,72,72,1.0
 Tier 2 – recall: cặp thỏa quy tắc được gắn Tier 2,72,72,1.0
-Tier 1 – đường dẫn bằng chứng đúng từng cạnh,36145,36145,1.0
-Tier 2 – đường dẫn bằng chứng đúng từng cạnh,1203,1203,1.0
-Tier 3 – đường dẫn bằng chứng đúng từng cạnh,3181,3181,1.0
+Tier 1 – đường dẫn bằng chứng đúng từng cạnh,33479,33479,1.0
+Tier 2 – đường dẫn bằng chứng đúng từng cạnh,2504,2504,1.0
+Tier 3 – đường dẫn bằng chứng đúng từng cạnh,4546,4546,1.0

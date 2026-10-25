@@ -1,0 +1,15 @@
+% Standalone wrapper to preview chapter4_implementation.tex on its own.
+% Compile with: pdflatex standalone_preview.tex
+\documentclass[11pt]{report}
+\usepackage[T1]{fontenc}
+\usepackage[utf8]{inputenc}
+\usepackage{amsmath}
+\usepackage{booktabs}
+\usepackage{hyperref}
+\usepackage[margin=1in]{geometry}
+
+\setcounter{chapter}{3} % so the next \chapter becomes "Chapter 4"
+
+\begin{document}
+\input{chapter4_implementation}
+\end{document}

@@ -26,6 +26,8 @@ def load(hub_degree_threshold: int | None = None):
         max_evidence=settings.max_evidence,
         mono_file=settings.mono_file,
         tier3_candidates_per_pair=settings.tier3_candidates_per_pair,
+        convergence_amplification=settings.convergence_amplification,
+        hub_degree_percentile=settings.hub_degree_percentile,
     )
     names = NameIndex.load(
         settings.drug_names_file,

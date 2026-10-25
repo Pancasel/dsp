@@ -670,10 +670,11 @@ def a5_clinical_benchmark(settings: Settings, graph, names, resolver) -> None:
     per_variant = collections.defaultdict(list)
     for case in cases:
         drugs = [resolver.resolve(name).stitch_id for name in case["drugs"].split("|")]
-        pair = tuple(sorted(resolver.resolve(name).stitch_id for name in case["interacting_pair"].split("|")))
-        if None in drugs or None in pair:
+        pair_ids = [resolver.resolve(name).stitch_id for name in case["interacting_pair"].split("|")]
+        if None in drugs or None in pair_ids:
             print(f"  case {case['case']}: drug not in Decagon, skipped")
             continue
+        pair = tuple(sorted(pair_ids))
         pattern = re.compile(EXPECTED_EFFECTS[case["expected"]], re.IGNORECASE)
         row = {"case": case["case"], "drugs": case["drugs"], "expected": case["expected"]}
         documented = graph.side_effects(*pair)
@@ -963,9 +964,11 @@ def write_report(meta: dict) -> None:
                 row[key] = _pct(row[key])
         parts += ["## A5. Benchmark tương tác thuốc kinh điển",
                   "",
-                  f"{len(detail)} ca tương tác đã được xác lập lâm sàng (`eval/clinical_benchmark.csv`), mỗi ca gồm cặp "
-                  "tương tác và một thuốc thứ ba. Đo vị trí tác dụng phụ mong đợi trong danh sách nghiêm trọng "
-                  "(hệ thống hiển thị 10 mục đầu).",
+                  f"{len(detail)} ca tương tác phổ biến trong nhãn thuốc và tài liệu dược lý (`eval/clinical_benchmark.csv`), "
+                  "mỗi ca gồm cặp tương tác và một thuốc thứ ba. Đo vị trí tác dụng phụ mong đợi trong danh sách "
+                  "nghiêm trọng (hệ thống hiển thị 10 mục đầu). Lưu ý: danh sách ca do AI tổng hợp từ kiến thức "
+                  "dược lý công khai và **chưa được bác sĩ/dược sĩ duyệt**; ca 27 trở đi được thêm sau để kiểm tra "
+                  "kết quả không phụ thuộc vào 26 ca đầu.",
                   "",
                   _table(a5, [("variant", "Cách xếp hạng"), ("documented", "Ca có dữ liệu"), ("hit@3", "Hit@3"),
                               ("hit@10", "Hit@10"), ("mrr", "MRR")]),

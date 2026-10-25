@@ -1,0 +1,14 @@
+regimen,k,evidence,raw_predictions,valid_predictions,tier3_valid,invented_ids,latency_s,error
+CID000005482|CID000002099|CID000003883|CID000119182,4,32,15,15,0,0,154.37,
+CID000005253|CID000004205|CID000060877|CID000004893,4,58,15,2,2,0,202.74,
+CID000003559|CID000110634|CID000003007|CID000004054|CID000002551,5,70,17,17,2,0,177.23,
+CID000003826|CID000667490|CID000003059|CID000004236|CID000002585,5,71,15,15,0,0,189.1,
+CID000002369|CID000004594|CID000060198|CID000002662|CID000004828,5,39,15,15,0,0,166.74,
+CID000004449|CID000003440|CID005493444|CID000060877,4,31,15,15,0,0,172.87,
+CID000130881|CID000003899|CID000002215|CID005353980,4,36,0,0,0,0,1.44,"HTTPStatusError: Client error '429 Too Many Requests' for url 'https://openrouter.ai/api/v1/chat/completions'
+For more information check: https://developer.mozilla.org/en-US/docs/Web/HTTP/Status/429"
+CID000002541|CID000005210|CID000000119,3,25,0,0,0,0,0.96,"HTTPStatusError: Client error '429 Too Many Requests' for url 'https://openrouter.ai/api/v1/chat/completions'
+For more information check: https://developer.mozilla.org/en-US/docs/Web/HTTP/Status/429"
+CID000077992|CID000004595|CID000003749|CID000004510|CID000002244,5,62,0,0,0,0,0.65,"HTTPStatusError: Client error '429 Too Many Requests' for url 'https://openrouter.ai/api/v1/chat/completions'
+For more information check: https://developer.mozilla.org/en-US/docs/Web/HTTP/Status/429"
+CID000003639|CID000003715|CID000003016,3,33,11,11,0,0,104.08,
