@@ -43,6 +43,8 @@ class SideEffectSeriousness:
         meddra_terms: dict[str, str],
         english_display_name: Callable[[str], str],
     ) -> None:
+        self.critical_keywords = critical_keywords
+        self.excluded_keywords = excluded_keywords
         # Lower-case Decagon name -> True/False from the EMA list.
         self.serious_labels = serious_labels
         # Lower-case Decagon name -> MedDRA term ("excess potassium" -> Hyperkalaemia).
